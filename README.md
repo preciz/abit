@@ -2,6 +2,8 @@
 
 Helper functions to use :atomics as a bit array in Elixir.
 
+Documentation can be found at [https://hexdocs.pm/abit](https://hexdocs.pm/abit).
+
 ## Installation
 
 Add `abit` to your list of dependencies in `mix.exs`:
@@ -24,5 +26,4 @@ end
 * `Abit.bit_at/2` - Returns the bit at a given position from atomics.
 * `Abit.set_bits_count/1` - Returns the number of bits set to 1 in atomics.
 
-Documentation can be found at [https://hexdocs.pm/abit](https://hexdocs.pm/abit).
 
