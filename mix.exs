@@ -34,6 +34,7 @@ defmodule Abit.MixProject do
 
   defp docs do
     [
+      main: "Abit",
       source_ref: "v#{@version}",
       source_url: @github,
     ]
