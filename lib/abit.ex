@@ -8,9 +8,11 @@ defmodule Abit do
   @doc """
   Returns number of bits in atomics `ref`.
 
-  iex> ref = :atomics.new(3, signed: false)
-  iex> ref |> Abit.bit_count
-  192
+  ## Example
+
+      iex> ref = :atomics.new(3, signed: false)
+      iex> ref |> Abit.bit_count
+      192
   """
   def bit_count(ref) when is_reference(ref) do
     %{size: size} = :atomics.info(ref)
@@ -72,13 +74,15 @@ defmodule Abit do
   @doc """
   Sets the bit at `bit_index` to `bit` in the atomic `ref`.
 
-  iex> ref = :atomics.new(1, signed: false)
-  iex> ref |> :atomics.put(1, 1)
-  iex> ref |> :atomics.get(1)
-  1
-  iex> ref |> Abit.set_bit(0, 0)
-  iex> ref |> :atomics.get(1)
-  0
+  ## Example
+
+      iex> ref = :atomics.new(1, signed: false)
+      iex> ref |> :atomics.put(1, 1)
+      iex> ref |> :atomics.get(1)
+      1
+      iex> ref |> Abit.set_bit(0, 0)
+      iex> ref |> :atomics.get(1)
+      0
   """
   def set_bit(ref, bit_index, bit) when is_reference(ref) and bit in [0, 1] do
     {atomics_index, integer_bit_index} = bit_position(bit_index)
@@ -130,12 +134,14 @@ defmodule Abit do
   `atomics_index` - the index of the atomics array where the bit is located
   `integer_bit_index` - the index of the bit in the integer at `atomics_index`
 
-  iex> Abit.bit_position(0)
-  {1, 0}
-  iex> Abit.bit_position(11)
-  {1, 11}
-  iex> Abit.bit_position(64)
-  {2, 0}
+  ## Example
+
+      iex> Abit.bit_position(0)
+      {1, 0}
+      iex> Abit.bit_position(11)
+      {1, 11}
+      iex> Abit.bit_position(64)
+      {2, 0}
   """
   def bit_position(bit_index) when is_integer(bit_index) and bit_index >= 0 do
     atomics_index = div(bit_index, 64) + 1
@@ -148,14 +154,16 @@ defmodule Abit do
   @doc """
   Returns bit at `bit_index` in atomic `ref`.
 
-  iex> ref = :atomics.new(1, signed: false)
-  iex> ref |> :atomics.put(1, 3)
-  iex> Abit.bit_at(ref, 0)
-  1
-  iex> Abit.bit_at(ref, 1)
-  1
-  iex> Abit.bit_at(ref, 2)
-  0
+  ## Example
+
+      iex> ref = :atomics.new(1, signed: false)
+      iex> ref |> :atomics.put(1, 3)
+      iex> Abit.bit_at(ref, 0)
+      1
+      iex> Abit.bit_at(ref, 1)
+      1
+      iex> Abit.bit_at(ref, 2)
+      0
   """
   def bit_at(ref, bit_index) when is_reference(ref) and is_integer(bit_index) do
     {atomics_index, integer_bit_index} = bit_position(bit_index)
@@ -172,13 +180,15 @@ defmodule Abit do
   @doc """
   Returns number of bits set to 1 in atomics array `ref`.
 
-  iex> ref = :atomics.new(1, signed: false)
-  iex> ref |> :atomics.put(1, 3)
-  iex> Abit.set_bits_count(ref)
-  2
-  iex> ref2 = :atomics.new(1, signed: false)
-  iex> Abit.set_bits_count(ref2)
-  0
+  ## Example
+
+      iex> ref = :atomics.new(1, signed: false)
+      iex> ref |> :atomics.put(1, 3)
+      iex> Abit.set_bits_count(ref)
+      2
+      iex> ref2 = :atomics.new(1, signed: false)
+      iex> Abit.set_bits_count(ref2)
+      0
   """
   def set_bits_count(ref) when is_reference(ref) do
     %{size: size} = ref |> :atomics.info()
