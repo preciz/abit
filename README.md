@@ -1,11 +1,10 @@
 # Abit
 
-**TODO: Add description**
+Helper functions to use :atomics as a bit array in Elixir.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `abit` to your list of dependencies in `mix.exs`:
+Add `abit` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -15,7 +14,15 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/abit](https://hexdocs.pm/abit).
+## API
+
+* `Abit.bit_count/1` - Returns count of bits in atomics.
+* `Abit.merge/2` - Merges bits of 2 atomics using Bitwise OR.
+* `Abit.intersect/2` - Intersects bits of 2 atomics using Bitwise AND.
+* `Abit.set_bit/3` - Sets a bit in atomics to 0 or 1.
+* `Abit.bit_position/1` - Returns the atomics position of a bit's index.
+* `Abit.bit_at/2` - Returns the bit at a given position from atomics.
+* `Abit.set_bits_count/1` - Returns the number of bits set to 1 in atomics.
+
+Documentation can be found at [https://hexdocs.pm/abit](https://hexdocs.pm/abit).
 
