@@ -81,6 +81,7 @@ defmodule Abit do
       iex> ref |> :atomics.get(1)
       1
       iex> ref |> Abit.set_bit(0, 0)
+      :ok
       iex> ref |> :atomics.get(1)
       0
   """
