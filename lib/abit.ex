@@ -24,15 +24,15 @@ defmodule Abit do
 
   After the operation `ref_a` will be returned.
   """
-  def merge_bitwise(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
+  def merge(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     %{size: size} = ref_a |> :atomics.info()
 
-    merge_bitwise(ref_a, ref_b, size)
+    merge(ref_a, ref_b, size)
   end
 
-  defp merge_bitwise(ref_a, _, 0), do: ref_a
+  defp merge(ref_a, _, 0), do: ref_a
 
-  defp merge_bitwise(ref_a, ref_b, index) do
+  defp merge(ref_a, ref_b, index) do
     :atomics.put(
       ref_a,
       index,
@@ -41,7 +41,7 @@ defmodule Abit do
 
     next_index = index - 1
 
-    merge_bitwise(ref_a, ref_b, next_index)
+    merge(ref_a, ref_b, next_index)
   end
 
   @doc """
@@ -49,15 +49,15 @@ defmodule Abit do
 
   After the operation `ref_a` will be returned.
   """
-  def intersect_bitwise(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
+  def intersect(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     %{size: size} = ref_a |> :atomics.info()
 
-    intersect_bitwise(ref_a, ref_b, size)
+    intersect(ref_a, ref_b, size)
   end
 
-  defp intersect_bitwise(ref_a, _, 0), do: ref_a
+  defp intersect(ref_a, _, 0), do: ref_a
 
-  defp intersect_bitwise(ref_a, ref_b, index) do
+  defp intersect(ref_a, ref_b, index) do
     :atomics.put(
       ref_a,
       index,
@@ -66,7 +66,7 @@ defmodule Abit do
 
     next_index = index - 1
 
-    intersect_bitwise(ref_a, ref_b, next_index)
+    intersect(ref_a, ref_b, next_index)
   end
 
   @doc """
