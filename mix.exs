@@ -45,7 +45,6 @@ defmodule Abit.MixProject do
       maintainers: ["Barna Kovacs"],
       licenses: ["MIT"],
       links: %{github: @github},
-      files: ~w(LICENSE.md README.md mix.exs)
     ]
   end
 end
