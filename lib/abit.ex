@@ -99,10 +99,10 @@ defmodule Abit do
     end
   end
 
-  defp set_bit(ref, atomics_index, integer_bit_index, 1, current_value) do
+  defp set_bit(ref, atomics_index, integer_bit_index, bit, current_value) do
     current_value = current_value || :atomics.get(ref, atomics_index)
 
-    next_value = Abit.Bitmask.set_bit_at(current_value, integer_bit_index, 1)
+    next_value = Abit.Bitmask.set_bit_at(current_value, integer_bit_index, bit)
 
     case :atomics.compare_exchange(ref, atomics_index, current_value, next_value) do
       :ok ->
@@ -110,25 +110,8 @@ defmodule Abit do
 
       non_matching_current_value ->
         case Abit.Bitmask.bit_at(non_matching_current_value, integer_bit_index) do
-          1 -> :ok
-          0 -> set_bit(ref, atomics_index, integer_bit_index, 0, non_matching_current_value)
-        end
-    end
-  end
-
-  defp set_bit(ref, atomics_index, integer_bit_index, 0, current_value) do
-    current_value = current_value || :atomics.get(ref, atomics_index)
-
-    next_value = Abit.Bitmask.set_bit_at(current_value, integer_bit_index, 0)
-
-    case :atomics.compare_exchange(ref, atomics_index, current_value, next_value) do
-      :ok ->
-        :ok
-
-      non_matching_current_value ->
-        case Abit.Bitmask.bit_at(non_matching_current_value, integer_bit_index) do
-          0 -> :ok
-          1 -> set_bit(ref, atomics_index, integer_bit_index, 0, non_matching_current_value)
+          ^bit -> :ok
+          _else -> set_bit(ref, atomics_index, integer_bit_index, bit, non_matching_current_value)
         end
     end
   end
