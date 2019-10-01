@@ -1,12 +1,16 @@
 defmodule Abit do
   @moduledoc """
   Functions to use :atomics as a bit array.
+
+  [Atomics](http://erlang.org/doc/man/atomics.html)
   """
 
   import Bitwise
 
   @doc """
   Returns number of bits in atomics `ref`.
+
+  Atomics are 64 bit integers so it is size * 64.
 
   ## Example
 
