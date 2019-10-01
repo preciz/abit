@@ -44,7 +44,7 @@ defmodule Abit.MixProject do
     [
       maintainers: ["Barna Kovacs"],
       licenses: ["MIT"],
-      links: %{github: @github},
+      links: %{"GitHub" => @github}
     ]
   end
 end
