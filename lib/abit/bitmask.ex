@@ -31,11 +31,14 @@ defmodule Abit.Bitmask do
     end
   end
 
-  def set_bit_at(integer, bit_index, bit) do
+  def set_bit_at(integer, bit_index, 0) do
     case bit_at(integer, bit_index) do
-      ^bit -> integer
-      0 -> integer ||| (1 <<< bit_index)
+      0 -> integer
       1 -> integer ^^^ (1 <<< bit_index)
     end
+  end
+
+  def set_bit_at(integer, bit_index, 1) do
+    integer ||| (1 <<< bit_index)
   end
 end
