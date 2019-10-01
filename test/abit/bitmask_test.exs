@@ -17,6 +17,12 @@ defmodule Abit.BitmaskTest do
     assert 1 == Bitmask.bit_at(1, 0)
     assert 0 == Bitmask.bit_at(1, 1)
     assert 1 == Bitmask.bit_at(8, 3)
+
+    0..9 |> Enum.each(fn n ->
+      num = :math.pow(2, n) |> floor
+
+      assert 1 == Bitmask.bit_at(num, n)
+    end)
   end
 
   test "set_bit_at" do
@@ -24,5 +30,11 @@ defmodule Abit.BitmaskTest do
     assert 1 == Bitmask.set_bit_at(0, 0, 1)
     assert 2 == Bitmask.set_bit_at(0, 1, 1)
     assert 8 == Bitmask.set_bit_at(0, 3, 1)
+
+    0..9 |> Enum.each(fn n ->
+      num = :math.pow(2, n) |> floor
+
+      assert 0 == Bitmask.set_bit_at(num, n, 0)
+    end)
   end
 end
