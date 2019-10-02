@@ -120,7 +120,7 @@ defmodule Abit do
   Returns a 2 tuple containing:
 
   `atomics_index` - the index of the atomics array where the bit is located
-  `integer_bit_index` - the index of the bit in the integer at `atomics_index`
+  `bit_index` - the index of the bit in the integer at `atomics_index`
 
   ## Example
 
@@ -134,9 +134,9 @@ defmodule Abit do
   def bit_position(bit_index) when is_integer(bit_index) and bit_index >= 0 do
     atomics_index = div(bit_index, 64) + 1
 
-    integer_bit_index = rem(bit_index, 64)
+    bit_index = rem(bit_index, 64)
 
-    {atomics_index, integer_bit_index}
+    {atomics_index, bit_index}
   end
 
   @doc """
