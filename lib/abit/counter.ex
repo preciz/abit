@@ -48,7 +48,7 @@ defmodule Abit.Counter do
     %Counter{
       atomics_ref: atomics_ref,
       signed: signed,
-      size: atomics_size * round(64 / counters_bit_size) ,
+      size: atomics_size * round(64 / counters_bit_size),
       counters_bit_size: counters_bit_size,
       min: min,
       max: max
@@ -62,9 +62,9 @@ defmodule Abit.Counter do
       when index >= 0 do
     {atomics_index, bit_index} = Abit.bit_position(counters_bit_size * index)
 
-    atomics_val = :atomics.get(atomics_ref, atomics_index)
+    atomics_value = :atomics.get(atomics_ref, atomics_index)
 
-    get_value(signed, counters_bit_size, bit_index, <<atomics_val::64>>)
+    get_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>)
   end
 
   def put(
@@ -75,12 +75,43 @@ defmodule Abit.Counter do
       when index >= 0 do
     {atomics_index, bit_index} = Abit.bit_position(counters_bit_size * index)
 
-    atomics_val = :atomics.get(atomics_ref, atomics_index)
+    atomics_value = :atomics.get(atomics_ref, atomics_index)
 
     <<new_value::64>> =
-      put_value(signed, counters_bit_size, bit_index, <<atomics_val::64>>, value)
+      put_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>, value)
 
     :atomics.put(atomics_ref, atomics_index, new_value)
+  end
+
+  def add(
+        counter = %Counter{
+          atomics_ref: atomics_ref,
+          signed: signed,
+          counters_bit_size: counters_bit_size
+        },
+        index,
+        incr
+      )
+      when index >= 0 do
+    {atomics_index, bit_index} = Abit.bit_position(counters_bit_size * index)
+
+    atomics_value = :atomics.get(atomics_ref, atomics_index)
+
+    current_value = get_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>)
+
+    next_value = current_value + incr
+
+    <<next_atomics_value::64>> =
+      put_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>, next_value)
+
+    case :atomics.compare_exchange(atomics_ref, atomics_index, atomics_value, next_atomics_value) do
+      :ok ->
+        :ok
+
+      _other_value ->
+        # there value at index was different, to keep the increment correct, we retry
+        add(counter, index, incr)
+    end
   end
 
   @bit_sizes
@@ -93,21 +124,21 @@ defmodule Abit.Counter do
       right_bits = bit_left_start - counters_bit_size
 
       defp unquote(:get_value)(
-            false,
-            unquote(counters_bit_size),
-            unquote(bit_index),
-            <<_::unquote(left_bits), value::unquote(counters_bit_size), _::unquote(right_bits)>>
-          ) do
+             false,
+             unquote(counters_bit_size),
+             unquote(bit_index),
+             <<_::unquote(left_bits), value::unquote(counters_bit_size), _::unquote(right_bits)>>
+           ) do
         value
       end
 
       defp unquote(:get_value)(
-            true,
-            unquote(counters_bit_size),
-            unquote(bit_index),
-            <<_left::unquote(left_bits), sign::1, value::unquote(counters_bit_size - 1),
-              _right::unquote(right_bits)>>
-          ) do
+             true,
+             unquote(counters_bit_size),
+             unquote(bit_index),
+             <<_left::unquote(left_bits), sign::1, value::unquote(counters_bit_size - 1),
+               _right::unquote(right_bits)>>
+           ) do
         case sign do
           0 -> value
           1 -> -value - 1
@@ -115,25 +146,25 @@ defmodule Abit.Counter do
       end
 
       defp unquote(:put_value)(
-            false,
-            unquote(counters_bit_size),
-            unquote(bit_index),
-            <<left::unquote(left_bits), _current_value::unquote(counters_bit_size),
-              right::unquote(right_bits)>>,
-            new_value
-          ) do
+             false,
+             unquote(counters_bit_size),
+             unquote(bit_index),
+             <<left::unquote(left_bits), _current_value::unquote(counters_bit_size),
+               right::unquote(right_bits)>>,
+             new_value
+           ) do
         <<left::unquote(left_bits), new_value::unquote(counters_bit_size),
           right::unquote(right_bits)>>
       end
 
       defp unquote(:put_value)(
-            true,
-            unquote(counters_bit_size),
-            unquote(bit_index),
-            <<left::unquote(left_bits), _sign::1, _current_value::unquote(counters_bit_size - 1),
-              right::unquote(right_bits)>>,
-            new_value
-          ) do
+             true,
+             unquote(counters_bit_size),
+             unquote(bit_index),
+             <<left::unquote(left_bits), _sign::1, _current_value::unquote(counters_bit_size - 1),
+               right::unquote(right_bits)>>,
+             new_value
+           ) do
         {new_value, sign} =
           case new_value < 0 do
             true -> {abs(new_value + 1), 1}
