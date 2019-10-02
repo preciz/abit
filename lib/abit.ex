@@ -1,8 +1,12 @@
 defmodule Abit do
   @moduledoc """
-  Functions to use :atomics as a bit array.
+  Use :atomics as a bit array or as an array of counters with n bits per counter in Elixir.
 
   [Atomics](http://erlang.org/doc/man/atomics.html)
+
+  The Abit module (this module) has functions to use an :atomics as a bit array.
+  The Abit.Counter module has functions to create an array of counters and
+  manipulate them.
   """
 
   import Bitwise
