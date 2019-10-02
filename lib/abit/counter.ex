@@ -23,6 +23,19 @@ defmodule Abit.Counter do
   @enforce_keys @keys
   defstruct @keys
 
+  @doc """
+  Returns a new %Abit.Counter{} struct.
+
+  * `size` - minimum number of counters to have
+  * `counters_bit_size` - how many bits a counter should use
+
+  ## Options:
+  * `signed` - whether to have signed or unsigned counters.
+
+  ## Examples
+      Abit.Counter.new(100, 8) # minimum 100 counters; 8 bits signed
+      Abit.Counter.new(10_000, 16, signed: false) # minimum 10_000 counters; 16 bits unsigned
+  """
   def new(size, counters_bit_size, options \\ [])
       when is_integer(size) and is_integer(counters_bit_size) do
     import Bitwise
@@ -55,6 +68,13 @@ defmodule Abit.Counter do
     }
   end
 
+  @doc """
+  Returns the value of counter at `index`.
+
+  iex> c = Abit.Counter.new(10, 8)
+  iex> c |> Abit.Counter.get(7)
+  0
+  """
   def get(
         %Counter{atomics_ref: atomics_ref, signed: signed, counters_bit_size: counters_bit_size},
         index
@@ -67,6 +87,17 @@ defmodule Abit.Counter do
     get_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>)
   end
 
+  @doc """
+  Puts the value into the counter at `index`.
+
+  Returns `:ok`.
+
+  iex> c = Abit.Counter.new(10, 8)
+  iex> c |> Abit.Counter.put(7, -12)
+  :ok
+  iex> c |> Abit.Counter.get(7)
+  -12
+  """
   def put(
         %Counter{atomics_ref: atomics_ref, signed: signed, counters_bit_size: counters_bit_size},
         index,
@@ -83,6 +114,18 @@ defmodule Abit.Counter do
     :atomics.put(atomics_ref, atomics_index, new_value)
   end
 
+  @doc """
+  Increments the value into the counter at `index`.
+
+  Returns `:ok`.
+
+  iex> c = Abit.Counter.new(10, 8)
+  iex> c |> Abit.Counter.add(7, -12)
+  iex> c |> Abit.Counter.add(7, -12)
+  :ok
+  iex> c |> Abit.Counter.get(7)
+  -24
+  """
   def add(
         counter = %Counter{
           atomics_ref: atomics_ref,
@@ -109,7 +152,7 @@ defmodule Abit.Counter do
         :ok
 
       _other_value ->
-        # there value at index was different, to keep the increment correct, we retry
+        # The value at index was different. To keep the increment correct we retry.
         add(counter, index, incr)
     end
   end

@@ -1,6 +1,8 @@
 defmodule Abit.CounterTest do
   use ExUnit.Case
 
+  doctest Abit.Counter
+
   alias Abit.Counter
 
   test "creates new %Abit.Counter{} struct" do
