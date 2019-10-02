@@ -37,7 +37,7 @@ defmodule Abit.Counter do
 
     atomics_size = ceil(size / (64 / counters_bit_size))
 
-    atomics_ref = :atomics.new(atomics_size, signed: signed)
+    atomics_ref = :atomics.new(atomics_size, signed: false)
 
     {min, max} =
       case signed do
