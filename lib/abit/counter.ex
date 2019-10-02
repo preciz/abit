@@ -3,12 +3,12 @@ defmodule Abit.Counter do
   Use atomics as an array of counters with n bits per 64 bit integer.
 
   Possible counters:
-  bits | unsigned value range | signed value range
-  2      0..3                   -2..1
-  4      0..15                  -8..7
-  8      0..255                 -128..127
-  16     0..65535               -32768..32767
-  32     0..4294967295          -2147483648..2147483647
+      bits | unsigned value range | signed value range
+      2      0..3                   -2..1
+      4      0..15                  -8..7
+      8      0..255                 -128..127
+      16     0..65535               -32768..32767
+      32     0..4294967295          -2147483648..2147483647
 
   If you need 64 bit counters:
   [Erlang -- counters](http://erlang.org/doc/man/counters.html)
