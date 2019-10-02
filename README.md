@@ -17,7 +17,7 @@ end
 ```
 
 ## API
-
+### Abit
 * `Abit.bit_count/1` - Returns count of bits in atomics.
 * `Abit.merge/2` - Merges bits of 2 atomics using Bitwise OR.
 * `Abit.intersect/2` - Intersects bits of 2 atomics using Bitwise AND.
@@ -25,7 +25,7 @@ end
 * `Abit.bit_position/1` - Returns the a bit's position in an atomics array.
 * `Abit.bit_at/2` - Returns the bit at a given position from atomics.
 * `Abit.set_bits_count/1` - Returns the number of bits set to 1 in atomics.
-
+### Abit.Counter
 * `Abit.Counter.new/2` - Create a new array of counters. Returns %Abit.Counter{} struct.
 * `Abit.Counter.get/2` - Returns the value of counter at the given index.
 * `Abit.Counter.put/3` - Puts the value into counter at the given index.
