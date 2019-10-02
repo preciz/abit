@@ -71,9 +71,10 @@ defmodule Abit.Counter do
   @doc """
   Returns the value of counter at `index`.
 
-  iex> c = Abit.Counter.new(10, 8)
-  iex> c |> Abit.Counter.get(7)
-  0
+  ## Examples
+      iex> c = Abit.Counter.new(10, 8)
+      iex> c |> Abit.Counter.get(7)
+      0
   """
   def get(
         %Counter{atomics_ref: atomics_ref, signed: signed, counters_bit_size: counters_bit_size},
@@ -92,11 +93,12 @@ defmodule Abit.Counter do
 
   Returns `:ok`.
 
-  iex> c = Abit.Counter.new(10, 8)
-  iex> c |> Abit.Counter.put(7, -12)
-  :ok
-  iex> c |> Abit.Counter.get(7)
-  -12
+  ## Examples
+      iex> c = Abit.Counter.new(10, 8)
+      iex> c |> Abit.Counter.put(7, -12)
+      :ok
+      iex> c |> Abit.Counter.get(7)
+      -12
   """
   def put(
         %Counter{atomics_ref: atomics_ref, signed: signed, counters_bit_size: counters_bit_size},
@@ -119,12 +121,13 @@ defmodule Abit.Counter do
 
   Returns `:ok`.
 
-  iex> c = Abit.Counter.new(10, 8)
-  iex> c |> Abit.Counter.add(7, -12)
-  iex> c |> Abit.Counter.add(7, -12)
-  :ok
-  iex> c |> Abit.Counter.get(7)
-  -24
+  ## Examples
+      iex> c = Abit.Counter.new(10, 8)
+      iex> c |> Abit.Counter.add(7, -12)
+      iex> c |> Abit.Counter.add(7, -12)
+      :ok
+      iex> c |> Abit.Counter.get(7)
+      -24
   """
   def add(
         counter = %Counter{
