@@ -15,7 +15,7 @@ defmodule Abit.MixProject do
       package: package(),
       homepage_url: @github,
       description: """
-      Helper functions to use :atomics as a bit array in Elixir.
+      Use :atomics as a bit array or as an array of counters with n bits per counter.
       """
     ]
   end
