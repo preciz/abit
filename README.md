@@ -1,6 +1,6 @@
 # Abit
 
-Helper functions to use :atomics as a bit array in Elixir.
+Use :atomics as a bit array or as an array of counters with n bits per counter in Elixir.
 
 Documentation can be found at [https://hexdocs.pm/abit](https://hexdocs.pm/abit).
 
@@ -26,4 +26,7 @@ end
 * `Abit.bit_at/2` - Returns the bit at a given position from atomics.
 * `Abit.set_bits_count/1` - Returns the number of bits set to 1 in atomics.
 
-
+* `Abit.Counter.new/2` - Create a new array of counters. Returns %Abit.Counter{} struct.
+* `Abit.Counter.get/2` - Returns the value of counter at the given index.
+* `Abit.Counter.put/3` - Puts the value into counter at the given index.
+* `Abit.Counter.add/3` - Adds the increment to counter at the given index.
