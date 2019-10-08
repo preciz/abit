@@ -72,4 +72,13 @@ defmodule AbitTest do
 
     assert 1 == Abit.hamming_distance(ref_l, ref_r)
   end
+
+  test "hamming_distance raises if sizes of atomics are non equal" do
+    assert_raise ArgumentError, fn ->
+      ref_l = :atomics.new(1, signed: false)
+      ref_r = :atomics.new(2, signed: false)
+
+      Abit.hamming_distance(ref_l, ref_r)
+    end
+  end
 end
