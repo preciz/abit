@@ -2,6 +2,7 @@ defmodule Abit.BitmaskTest do
   use ExUnit.Case
 
   alias Abit.Bitmask
+  doctest Bitmask
 
   test "set_bits_count" do
     assert 1 == Bitmask.set_bits_count(1)
