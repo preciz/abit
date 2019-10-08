@@ -18,11 +18,11 @@ defmodule Abit.Bitmask do
       iex> Abit.Bitmask.set_bits_count(1023)
       10
   """
-  def set_bits_count(int, acc \\ 0)
+  def set_bits_count(int), do: set_bits_count(int, 0)
 
-  def set_bits_count(0, acc), do: acc
+  defp set_bits_count(0, acc), do: acc
 
-  def set_bits_count(int, acc) when is_integer(int) and is_integer(acc) do
+  defp set_bits_count(int, acc) when is_integer(int) and is_integer(acc) do
     case int &&& 1 do
       0 ->
         int = int >>> 1
