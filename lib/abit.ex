@@ -97,7 +97,9 @@ defmodule Abit do
     {atomics_index, integer_bit_index} = bit_position(bit_index)
 
     case bit_at(ref, bit_index) do
-      ^bit -> :ok
+      ^bit ->
+        :ok
+
       _else ->
         set_bit(ref, atomics_index, integer_bit_index, bit, nil)
     end
