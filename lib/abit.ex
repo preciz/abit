@@ -201,4 +201,55 @@ defmodule Abit do
 
     set_bits_count(ref, next_index, new_acc)
   end
+
+  @doc """
+  Calculates the bitwise hamming distance of two `:atomics` references.
+
+  It accepts two `:atomics` references `ref_l` and `ref_r`.
+
+  It returns `{:ok, distance}` where distance is a non negative integer or
+  `{:error, reason}` if the size of `ref_l` and `ref_r` don't equal.
+
+  ## Examples
+      iex> ref_l = :atomics.new(10, signed: false)
+      iex> ref_r = :atomics.new(10, signed: false)
+      iex> Abit.hamming_distance(ref_l, ref_r)
+      0
+      iex> ref_l |> :atomics.put(1, 7)
+      iex> Abit.hamming_distance(ref_l, ref_r)
+      3
+  """
+  def hamming_distance(ref_l, ref_r) when is_reference(ref_l) and is_reference(ref_r) do
+    %{size: ref_l_size} = ref_l |> :atomics.info()
+    %{size: ref_r_size} = ref_r |> :atomics.info()
+
+    if ref_l_size != ref_r_size do
+      raise ArgumentError,
+            "The sizes of the provided `:atomics` references don't match" <>
+              "Size of `ref_l` is #{ref_l_size}. Size of `ref_r` is #{ref_r_size}."
+    end
+
+    do_hamming_distance(ref_l, ref_r, 1, ref_l_size, 0)
+  end
+
+  defp do_hamming_distance(ref_l, ref_r, index, index, acc) do
+    acc + hamming_distance_at(ref_l, ref_r, index)
+  end
+
+  defp do_hamming_distance(ref_l, ref_r, index, size, acc) do
+    do_hamming_distance(
+      ref_l,
+      ref_r,
+      index + 1,
+      size,
+      acc + hamming_distance_at(ref_l, ref_r, index)
+    )
+  end
+
+  defp hamming_distance_at(ref_l, ref_r, index) do
+    ref_l_value = ref_l |> :atomics.get(index)
+    ref_r_value = ref_r |> :atomics.get(index)
+
+    Abit.Bitmask.hamming_distance(ref_l_value, ref_r_value)
+  end
 end

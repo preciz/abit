@@ -54,4 +54,22 @@ defmodule AbitTest do
     assert 0 = :atomics.get(intersect_ref, 1)
     assert 1 = :atomics.get(intersect_ref, 2)
   end
+
+  test "hamming distance of 2 atomics bit arrays" do
+    ref_l = :atomics.new(10, signed: false)
+    ref_r = :atomics.new(10, signed: false)
+    assert 0 == Abit.hamming_distance(ref_l, ref_r)
+
+    ref_l |> :atomics.put(1, 7)
+
+    assert 3 == Abit.hamming_distance(ref_l, ref_r)
+
+    ref_r |> :atomics.put(1, 7)
+
+    assert 0 == Abit.hamming_distance(ref_l, ref_r)
+
+    ref_r |> :atomics.put(2, 1024)
+
+    assert 1 == Abit.hamming_distance(ref_l, ref_r)
+  end
 end
