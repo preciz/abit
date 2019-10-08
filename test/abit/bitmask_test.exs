@@ -38,4 +38,16 @@ defmodule Abit.BitmaskTest do
       assert 0 == Bitmask.set_bit_at(num, n, 0)
     end)
   end
+
+  test "hamming distance" do
+    assert 0 == Bitmask.hamming_distance(0, 0)
+    assert 0 == Bitmask.hamming_distance(1, 1)
+    assert 0 == Bitmask.hamming_distance(1024, 1024)
+
+    assert 1 == Bitmask.hamming_distance(0, 1)
+    assert 1 == Bitmask.hamming_distance(1, 0)
+
+    assert 2 == Bitmask.hamming_distance(1, 7)
+    assert 2 == Bitmask.hamming_distance(1, 8)
+  end
 end

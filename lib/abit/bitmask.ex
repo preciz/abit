@@ -80,4 +80,19 @@ defmodule Abit.Bitmask do
   def set_bit_at(integer, bit_index, 1) do
     integer ||| (1 <<< bit_index)
   end
+
+  @doc """
+  Returns the hamming distance of the bits of two integers.
+
+  ## Example
+      iex> Abit.Bitmask.hamming_distance(1, 0)
+      1
+      iex> Abit.Bitmask.hamming_distance(1, 1023)
+      9
+      iex> Abit.Bitmask.hamming_distance(1, 1024)
+      2
+  """
+  def hamming_distance(int_l, int_r) when is_integer(int_l) and is_integer(int_r) do
+    (int_l ^^^ int_r) |> set_bits_count
+  end
 end
