@@ -203,12 +203,11 @@ defmodule Abit do
   end
 
   @doc """
-  Calculates the bitwise hamming distance of two `:atomics` references.
+  Returns the bitwise hamming distance of two `:atomics` references.
 
   It accepts two `:atomics` references `ref_l` and `ref_r`.
 
-  It returns `{:ok, distance}` where distance is a non negative integer or
-  `{:error, reason}` if the size of `ref_l` and `ref_r` don't equal.
+  Raises ArgumentError if the size of `ref_l` and `ref_r` don't equal.
 
   ## Examples
       iex> ref_l = :atomics.new(10, signed: false)

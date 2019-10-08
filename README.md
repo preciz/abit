@@ -25,6 +25,7 @@ end
 * `Abit.bit_position/1` - Returns the a bit's position in an atomics array.
 * `Abit.bit_at/2` - Returns the bit at a given position from atomics.
 * `Abit.set_bits_count/1` - Returns the number of bits set to 1 in atomics.
+* `Abit.hamming_distance/2` - Returns the bitwise hamming distance of 2 atomics references.
 ### Abit.Counter
 * `Abit.Counter.new/2` - Create a new array of counters. Returns %Abit.Counter{} struct.
 * `Abit.Counter.get/2` - Returns the value of counter at the given index.
