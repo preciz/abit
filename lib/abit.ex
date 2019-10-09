@@ -22,6 +22,7 @@ defmodule Abit do
       iex> ref |> Abit.bit_count
       192
   """
+  @spec bit_count(reference) :: non_neg_integer
   def bit_count(ref) when is_reference(ref) do
     %{size: size} = :atomics.info(ref)
 
@@ -34,6 +35,7 @@ defmodule Abit do
 
   After the operation `ref_a` will be returned.
   """
+  @spec merge(reference, reference) :: reference
   def merge(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     %{size: size} = ref_a |> :atomics.info()
 
@@ -59,6 +61,7 @@ defmodule Abit do
 
   After the operation `ref_a` will be returned.
   """
+  @spec intersect(reference, reference) :: reference
   def intersect(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     %{size: size} = ref_a |> :atomics.info()
 
@@ -93,6 +96,7 @@ defmodule Abit do
       iex> ref |> :atomics.get(1)
       0
   """
+  @spec set_bit(reference, non_neg_integer, 0 | 1) :: :ok
   def set_bit(ref, bit_index, bit) when is_reference(ref) and bit in [0, 1] do
     {atomics_index, integer_bit_index} = bit_position(bit_index)
 
@@ -137,6 +141,7 @@ defmodule Abit do
       iex> Abit.bit_position(64)
       {2, 0}
   """
+  @spec bit_position(non_neg_integer) ::  {non_neg_integer, non_neg_integer}
   def bit_position(bit_index) when is_integer(bit_index) and bit_index >= 0 do
     atomics_index = div(bit_index, 64) + 1
 
@@ -159,6 +164,7 @@ defmodule Abit do
       iex> Abit.bit_at(ref, 2)
       0
   """
+  @spec bit_at(reference, non_neg_integer) :: 0 | 1
   def bit_at(ref, bit_index) when is_reference(ref) and is_integer(bit_index) do
     {atomics_index, integer_bit_index} = bit_position(bit_index)
 
@@ -184,6 +190,7 @@ defmodule Abit do
       iex> Abit.set_bits_count(ref2)
       0
   """
+  @spec set_bits_count(reference) :: non_neg_integer
   def set_bits_count(ref) when is_reference(ref) do
     %{size: size} = ref |> :atomics.info()
 
@@ -218,6 +225,7 @@ defmodule Abit do
       iex> Abit.hamming_distance(ref_l, ref_r)
       3
   """
+  @spec hamming_distance(reference, reference) :: non_neg_integer
   def hamming_distance(ref_l, ref_r) when is_reference(ref_l) and is_reference(ref_r) do
     %{size: ref_l_size} = ref_l |> :atomics.info()
     %{size: ref_r_size} = ref_r |> :atomics.info()

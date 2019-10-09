@@ -18,6 +18,7 @@ defmodule Abit.Bitmask do
       iex> Abit.Bitmask.set_bits_count(1023)
       10
   """
+  @spec set_bits_count(integer) :: non_neg_integer
   def set_bits_count(int), do: set_bits_count(int, 0)
 
   defp set_bits_count(0, acc), do: acc
@@ -51,6 +52,7 @@ defmodule Abit.Bitmask do
       iex> Abit.Bitmask.bit_at(0, 0)
       0
   """
+  @spec bit_at(integer, non_neg_integer) :: 0 | 1
   def bit_at(integer, bit_index) when is_integer(integer) and is_integer(bit_index) do
     case integer ||| 1 <<< bit_index do
       ^integer -> 1
@@ -70,6 +72,7 @@ defmodule Abit.Bitmask do
       iex> Abit.Bitmask.set_bit_at(0, 2, 1)
       4
   """
+  @spec set_bit_at(integer, non_neg_integer, 0 | 1) :: integer
   def set_bit_at(integer, bit_index, 0) do
     case bit_at(integer, bit_index) do
       0 -> integer
@@ -92,6 +95,7 @@ defmodule Abit.Bitmask do
       iex> Abit.Bitmask.hamming_distance(1, 1024)
       2
   """
+  @spec hamming_distance(integer, integer) :: non_neg_integer
   def hamming_distance(int_l, int_r) when is_integer(int_l) and is_integer(int_r) do
     (int_l ^^^ int_r) |> set_bits_count
   end
