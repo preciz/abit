@@ -10,8 +10,8 @@ defmodule Abit.Counter do
       16     0..65535               -32768..32767
       32     0..4294967295          -2147483648..2147483647
 
-  If you need 64 bit counters:
-  [Erlang -- counters](http://erlang.org/doc/man/counters.html)
+  If you need 64 bit counters use:
+  [Erlang counters](http://erlang.org/doc/man/counters.html)
   """
 
   @bit_sizes [2, 4, 8, 16, 32]
