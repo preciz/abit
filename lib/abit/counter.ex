@@ -23,6 +23,15 @@ defmodule Abit.Counter do
   @enforce_keys @keys
   defstruct @keys
 
+  @type t :: %__MODULE__{
+    atomics_ref: reference,
+    signed: boolean,
+    size: non_neg_integer,
+    counters_bit_size: 2 | 4 | 8 | 16 | 32,
+    min: integer,
+    max: non_neg_integer
+  }
+
   @doc """
   Returns a new %Abit.Counter{} struct.
 
@@ -36,6 +45,7 @@ defmodule Abit.Counter do
       Abit.Counter.new(100, 8) # minimum 100 counters; 8 bits signed
       Abit.Counter.new(10_000, 16, signed: false) # minimum 10_000 counters; 16 bits unsigned
   """
+  @spec new(non_neg_integer, 2 | 4 | 8 | 16 | 32, list) :: t
   def new(size, counters_bit_size, options \\ [])
       when is_integer(size) and is_integer(counters_bit_size) do
     import Bitwise
@@ -76,6 +86,7 @@ defmodule Abit.Counter do
       iex> c |> Abit.Counter.get(7)
       0
   """
+  @spec get(t, non_neg_integer) :: integer
   def get(
         %Counter{atomics_ref: atomics_ref, signed: signed, counters_bit_size: counters_bit_size},
         index
@@ -100,6 +111,7 @@ defmodule Abit.Counter do
       iex> c |> Abit.Counter.get(7)
       -12
   """
+  @spec put(t, non_neg_integer, integer) :: :ok
   def put(
         %Counter{atomics_ref: atomics_ref, signed: signed, counters_bit_size: counters_bit_size},
         index,
@@ -129,6 +141,7 @@ defmodule Abit.Counter do
       iex> c |> Abit.Counter.get(7)
       -24
   """
+  @spec add(t, non_neg_integer, integer) :: :ok
   def add(
         counter = %Counter{
           atomics_ref: atomics_ref,
