@@ -46,12 +46,12 @@ defmodule Abit do
   def merge(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     %{size: size} = ref_a |> :atomics.info()
 
-    merge(ref_a, ref_b, size)
+    do_merge(ref_a, ref_b, size)
   end
 
-  defp merge(ref_a, _, 0), do: ref_a
+  defp do_merge(ref_a, _, 0), do: ref_a
 
-  defp merge(ref_a, ref_b, index) do
+  defp do_merge(ref_a, ref_b, index) do
     :atomics.put(
       ref_a,
       index,
@@ -60,7 +60,7 @@ defmodule Abit do
 
     next_index = index - 1
 
-    merge(ref_a, ref_b, next_index)
+    do_merge(ref_a, ref_b, next_index)
   end
 
   @doc """
