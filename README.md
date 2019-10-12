@@ -17,6 +17,8 @@ end
 ```
 
 ## API
+See [https://hexdocs.pm/abit](https://hexdocs.pm/abit) for full documentation.
+
 ### Abit
 * `Abit.bit_count/1` - Returns count of bits in atomics.
 * `Abit.merge/2` - Merges bits of 2 atomics using Bitwise OR.
