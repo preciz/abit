@@ -15,7 +15,8 @@ defmodule Abit.Counter do
   [Erlang counters](http://erlang.org/doc/man/counters.html)
 
   The option `wrap_around` is set to `false` by default. With these
-  small-ish counters this is a safety default.
+  small-ish counters this is a safety default. If set to true the `add/3`
+  and `put/3` functions will never return `{:error, :value_out_of_bounds}`.
 
   While Erlang :atomics are 1 indexed, `Abit.Counter` counters are 0 indexed.
   """
@@ -128,6 +129,8 @@ defmodule Abit.Counter do
       {:ok, {7, -12}}
       iex> c |> Abit.Counter.get(7)
       -12
+      iex> c |> Abit.Counter.put(7, 128)
+      {:error, :value_out_of_bounds}
   """
   @spec put(t, non_neg_integer, integer) :: :ok
   def put(%Counter{wrap_around: false, min: min, max: max}, _, value)
@@ -166,6 +169,8 @@ defmodule Abit.Counter do
       {:ok, {7, -12}}
       iex> c |> Abit.Counter.add(7, 36)
       {:ok, {7, 24}}
+      iex> c |> Abit.Counter.put(1, 1000)
+      {:error, :value_out_of_bounds}
   """
   @spec add(t, non_neg_integer, integer) :: :ok
   def add(
