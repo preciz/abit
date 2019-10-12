@@ -9,6 +9,8 @@ defmodule Abit do
 
   The `Abit.Counter` module has functions to create an array of counters and
   manipulate them.
+
+  The `Abit.Bitmask` module has functions to help working with bitmasks.
   """
 
   import Bitwise
