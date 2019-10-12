@@ -15,7 +15,7 @@ defmodule Abit.MixProject do
       package: package(),
       homepage_url: @github,
       description: """
-      Use :atomics as a bit array or as an array of counters with N bits per counter.
+      Use `:atomics` as a bit array or as an array of N-bit counters.
       """
     ]
   end

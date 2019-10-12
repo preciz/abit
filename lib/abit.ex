@@ -1,24 +1,25 @@
 defmodule Abit do
   @moduledoc """
-  Use `:atomics` as a bit array or as an array of counters with N bits per counter in Elixir.
+  Use `:atomics` as a bit array or as an array of N-bit counters.
 
   [Erlang atomics documentation](http://erlang.org/doc/man/atomics.html)
 
-  The `Abit` module (this module) has functions to use an :atomics as a bit array.
+  The `Abit` module (this module) has functions to use an `:atomics` as a bit array.
   The bit array is zero indexed.
 
-  The `Abit.Counter` module has functions to create an array of counters and
-  manipulate them.
+  The `Abit.Counter` functions to use `:atomics` as an array of N-bit
+  counters and manipulate them.
 
-  The `Abit.Bitmask` module has functions to help working with bitmasks.
+  The `Abit.Bitmask` functions help working with bitmasks.
   """
 
   import Bitwise
 
   @doc """
-  Returns number of bits in atomics `ref`.
+  Returns count of total bits in atomics `ref`.
 
-  Atomics are 64 bit integers so it is size * 64.
+  `:atomics` are 64 bit integers so total bits
+  count is array size * 64.
 
   ## Examples
 
@@ -37,10 +38,11 @@ defmodule Abit do
   end
 
   @doc """
-  Bit merge atomics using Bitwise OR operator.
-  `ref_b` will be merged into `ref_a`.
+  Merge bits of atomics `ref_a` & `ref_b` using the
+  bitwise OR operator.
 
-  After the operation `ref_a` will be returned.
+  `ref_b` will be merged into `ref_a`.
+  Returns `ref_a` mutated.
   """
   @spec merge(reference, reference) :: reference
   def merge(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do

@@ -1,6 +1,6 @@
 # Abit
 
-Use :atomics as a bit array or as an array of counters with N bits per counter in Elixir.
+Use `:atomics` as a bit array or as an array of N-bit counters.
 
 Documentation can be found at [https://hexdocs.pm/abit](https://hexdocs.pm/abit).
 
