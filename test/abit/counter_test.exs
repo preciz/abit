@@ -42,7 +42,7 @@ defmodule Abit.CounterTest do
     assert is_reference(atomics_ref)
   end
 
-  test "gets & puts value" do
+  test "gets & puts & adds value" do
     counter = Counter.new(10, 8)
 
     1..10
@@ -54,6 +54,9 @@ defmodule Abit.CounterTest do
     |> Enum.each(fn n ->
       assert {:ok, {n, n}} = counter |> Counter.put(n, n)
       assert n = counter |> Counter.get(n)
+
+      expected = n + n
+      assert {:ok, {n, ^expected}} = counter |> Counter.add(n, n)
     end)
   end
 
