@@ -21,7 +21,7 @@ defmodule Abit.Counter do
 
   alias Abit.Counter
 
-  @keys [:atomics_ref, :signed, :size, :counters_bit_size, :min, :max]
+  @keys [:atomics_ref, :signed, :wrap_around, :size, :counters_bit_size, :min, :max]
 
   @enforce_keys @keys
   defstruct @keys
@@ -29,6 +29,7 @@ defmodule Abit.Counter do
   @type t :: %__MODULE__{
           atomics_ref: reference,
           signed: boolean,
+          wrap_around: boolean,
           size: pos_integer,
           counters_bit_size: 2 | 4 | 8 | 16 | 32,
           min: integer,
@@ -46,11 +47,13 @@ defmodule Abit.Counter do
   ## Options
 
     * `signed` - whether to have signed or unsigned counters. Defaults to `true`.
+    * `wrap_around` - whether countesr should wrap around. Defaults to `false`.
 
   ## Examples
 
       Abit.Counter.new(100, 8) # minimum 100 counters; 8 bits signed
       Abit.Counter.new(10_000, 16, signed: false) # minimum 10_000 counters; 16 bits unsigned
+      Abit.Counter.new(10_000, 16, wrap_around: false) # don't wrap around counters
   """
   @spec new(non_neg_integer, 2 | 4 | 8 | 16 | 32, list) :: t
   def new(size, counters_bit_size, options \\ [])
@@ -64,6 +67,7 @@ defmodule Abit.Counter do
     end
 
     signed = options |> Keyword.get(:signed, true)
+    wrap_around = options |> Keyword.get(:wrap_around, false)
 
     atomics_size = ceil(size / (64 / counters_bit_size))
 
@@ -78,6 +82,7 @@ defmodule Abit.Counter do
     %Counter{
       atomics_ref: atomics_ref,
       signed: signed,
+      wrap_around: wrap_around,
       size: atomics_size * round(64 / counters_bit_size),
       counters_bit_size: counters_bit_size,
       min: min,
@@ -110,17 +115,23 @@ defmodule Abit.Counter do
   @doc """
   Puts the value into the counter at `index`.
 
-  Returns `:ok`.
+  Returns `{:ok, value}` or `{:error, :value_out_of_bounds}` if
+  option `wrap_around` is `false` and value is out of bounds.
 
   ## Examples
 
       iex> c = Abit.Counter.new(10, 8)
       iex> c |> Abit.Counter.put(7, -12)
-      :ok
+      {:ok, {7, -12}}
       iex> c |> Abit.Counter.get(7)
       -12
   """
   @spec put(t, non_neg_integer, integer) :: :ok
+  def put(%Counter{wrap_around: false, min: min, max: max}, _, value)
+      when value < min or value > max do
+    {:error, :value_out_of_bounds}
+  end
+
   def put(
         %Counter{atomics_ref: atomics_ref, signed: signed, counters_bit_size: counters_bit_size},
         index,
@@ -131,23 +142,26 @@ defmodule Abit.Counter do
 
     atomics_value = :atomics.get(atomics_ref, atomics_index)
 
-    <<new_value::64>> =
+    {final_counter_value, <<next_atomics_value::64>>} =
       put_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>, value)
 
-    :atomics.put(atomics_ref, atomics_index, new_value)
+    :atomics.put(atomics_ref, atomics_index, next_atomics_value)
+
+    {:ok, {index, final_counter_value}}
   end
 
   @doc """
   Increments the value of the counter at `index` with `incr`.
 
-  Returns `:ok`.
+  Returns `{:ok, value_after_increment}` or `{:error, :value_out_of_bounds}` if
+  option `wrap_around` is `false` and value is out of bounds.
 
   ## Examples
 
       iex> c = Abit.Counter.new(10, 8)
       iex> c |> Abit.Counter.add(7, -12)
       iex> c |> Abit.Counter.add(7, -12)
-      :ok
+      {:ok, {7, -24}}
       iex> c |> Abit.Counter.get(7)
       -24
   """
@@ -156,7 +170,10 @@ defmodule Abit.Counter do
         counter = %Counter{
           atomics_ref: atomics_ref,
           signed: signed,
-          counters_bit_size: counters_bit_size
+          wrap_around: wrap_around,
+          counters_bit_size: counters_bit_size,
+          min: min,
+          max: max
         },
         index,
         incr
@@ -170,16 +187,27 @@ defmodule Abit.Counter do
 
     next_value = current_value + incr
 
-    <<next_atomics_value::64>> =
-      put_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>, next_value)
+    case {wrap_around, next_value < min or next_value > max} do
+      {false, true} ->
+        {:error, :value_out_of_bounds}
 
-    case :atomics.compare_exchange(atomics_ref, atomics_index, atomics_value, next_atomics_value) do
-      :ok ->
-        :ok
+      {_, _} ->
+        {final_counter_value, <<next_atomics_value::64>>} =
+          put_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>, next_value)
 
-      _other_value ->
-        # The value at index was different. To keep the increment correct we retry.
-        add(counter, index, incr)
+        case :atomics.compare_exchange(
+               atomics_ref,
+               atomics_index,
+               atomics_value,
+               next_atomics_value
+             ) do
+          :ok ->
+            {:ok, {index, final_counter_value}}
+
+          _other_value ->
+            # The value at index was different. To keep the increment correct we retry.
+            add(counter, index, incr)
+        end
     end
   end
 
@@ -205,13 +233,10 @@ defmodule Abit.Counter do
              true,
              unquote(counters_bit_size),
              unquote(bit_index),
-             <<_left::unquote(left_bits), sign::1, value::unquote(counters_bit_size - 1),
+             <<_left::unquote(left_bits), value::unquote(counters_bit_size)-signed,
                _right::unquote(right_bits)>>
            ) do
-        case sign do
-          0 -> value
-          1 -> -value - 1
-        end
+        value
       end
 
       defp unquote(:put_value)(
@@ -222,26 +247,32 @@ defmodule Abit.Counter do
                right::unquote(right_bits)>>,
              new_value
            ) do
-        <<left::unquote(left_bits), new_value::unquote(counters_bit_size),
-          right::unquote(right_bits)>>
+        <<final_counter_value::unquote(counters_bit_size)>> =
+          <<new_value::unquote(counters_bit_size)>>
+
+        {
+          final_counter_value,
+          <<left::unquote(left_bits), new_value::unquote(counters_bit_size),
+            right::unquote(right_bits)>>
+        }
       end
 
       defp unquote(:put_value)(
              true,
              unquote(counters_bit_size),
              unquote(bit_index),
-             <<left::unquote(left_bits), _sign::1, _current_value::unquote(counters_bit_size - 1),
+             <<left::unquote(left_bits), _current_value::unquote(counters_bit_size)-signed,
                right::unquote(right_bits)>>,
              new_value
            ) do
-        {new_value, sign} =
-          case new_value < 0 do
-            true -> {abs(new_value + 1), 1}
-            false -> {new_value, 0}
-          end
+        <<final_counter_value::unquote(counters_bit_size)-signed>> =
+          <<new_value::unquote(counters_bit_size)-signed>>
 
-        <<left::unquote(left_bits), sign::1, new_value::unquote(counters_bit_size - 1),
-          right::unquote(right_bits)>>
+        {
+          final_counter_value,
+          <<left::unquote(left_bits), new_value::unquote(counters_bit_size)-signed,
+            right::unquote(right_bits)>>
+        }
       end
     end)
   end)

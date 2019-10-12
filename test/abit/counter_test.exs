@@ -52,26 +52,26 @@ defmodule Abit.CounterTest do
 
     1..10
     |> Enum.each(fn n ->
-      assert :ok = counter |> Counter.put(n, n)
+      assert {:ok, {n, n}} = counter |> Counter.put(n, n)
       assert n = counter |> Counter.get(n)
     end)
   end
 
+  test "wrap around false" do
+    counter = Counter.new(10, 8)
+
+    counter |> Counter.put(0, 127)
+    counter |> Counter.put(1, -128)
+
+    assert {:error, :value_out_of_bounds} = counter |> Counter.add(0, 1)
+    assert {:error, :value_out_of_bounds} = counter |> Counter.add(1, -1)
+  end
+
   test "unsigned counters wrap around correctly" do
-    counter = Counter.new(10, 8, signed: false)
+    counter = Counter.new(10, 8, signed: false, wrap_around: true)
 
     counter |> Counter.put(0, 255)
-    counter |> Counter.put(1, 255)
-    counter |> Counter.put(2, 255)
 
-    assert 255 == Counter.get(counter, 0)
-    assert 255 == Counter.get(counter, 1)
-    assert 255 == Counter.get(counter, 2)
-
-    counter |> Counter.add(1, 1)
-
-    assert 255 == Counter.get(counter, 0)
-    assert 0 == Counter.get(counter, 1)
-    assert 255 == Counter.get(counter, 2)
+    assert {:ok, {0, 0}} = counter |> Counter.add(0, 1)
   end
 end
