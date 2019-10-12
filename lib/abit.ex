@@ -52,15 +52,11 @@ defmodule Abit do
   defp do_merge(ref_a, _, 0), do: ref_a
 
   defp do_merge(ref_a, ref_b, index) do
-    :atomics.put(
-      ref_a,
-      index,
-      :atomics.get(ref_a, index) ||| :atomics.get(ref_b, index)
-    )
+    merged_value = :atomics.get(ref_a, index) ||| :atomics.get(ref_b, index)
 
-    next_index = index - 1
+    :atomics.put(ref_a, index, merged_value)
 
-    do_merge(ref_a, ref_b, next_index)
+    do_merge(ref_a, ref_b, index - 1)
   end
 
   @doc """
