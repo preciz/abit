@@ -5,6 +5,7 @@ defmodule Abit do
   [Erlang atomics documentation](http://erlang.org/doc/man/atomics.html)
 
   The `Abit` module (this module) has functions to use an :atomics as a bit array.
+  The bit array is zero indexed.
 
   The `Abit.Counter` module has functions to create an array of counters and
   manipulate them.
@@ -146,7 +147,7 @@ defmodule Abit do
       iex> Abit.bit_position(64)
       {2, 0}
   """
-  @spec bit_position(non_neg_integer) ::  {non_neg_integer, non_neg_integer}
+  @spec bit_position(non_neg_integer) :: {non_neg_integer, non_neg_integer}
   def bit_position(bit_index) when is_integer(bit_index) and bit_index >= 0 do
     atomics_index = div(bit_index, 64) + 1
 

@@ -13,6 +13,8 @@ defmodule Abit.Counter do
 
   If you need 64 bit counters use:
   [Erlang counters](http://erlang.org/doc/man/counters.html)
+
+  While Erlang :atomics are 1 indexed, `Abit.Counter` counters are 0 indexed.
   """
 
   @bit_sizes [2, 4, 8, 16, 32]
@@ -25,13 +27,13 @@ defmodule Abit.Counter do
   defstruct @keys
 
   @type t :: %__MODULE__{
-    atomics_ref: reference,
-    signed: boolean,
-    size: pos_integer,
-    counters_bit_size: 2 | 4 | 8 | 16 | 32,
-    min: integer,
-    max: pos_integer
-  }
+          atomics_ref: reference,
+          signed: boolean,
+          size: pos_integer,
+          counters_bit_size: 2 | 4 | 8 | 16 | 32,
+          min: integer,
+          max: pos_integer
+        }
 
   @doc """
   Returns a new `%Abit.Counter{}` struct.
@@ -43,7 +45,7 @@ defmodule Abit.Counter do
 
   ## Options
 
-    * `signed` - whether to have signed or unsigned counters.
+    * `signed` - whether to have signed or unsigned counters. Defaults to `true`.
 
   ## Examples
 

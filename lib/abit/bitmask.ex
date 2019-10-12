@@ -84,7 +84,7 @@ defmodule Abit.Bitmask do
   end
 
   def set_bit_at(integer, bit_index, 1) do
-    integer ||| (1 <<< bit_index)
+    integer ||| 1 <<< bit_index
   end
 
   @doc """
