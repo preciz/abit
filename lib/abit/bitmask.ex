@@ -8,7 +8,8 @@ defmodule Abit.Bitmask do
   @doc """
   Returns the count of bits set to 1 in `int` integer.
 
-  ## Example
+  ## Examples
+
       iex> Abit.Bitmask.set_bits_count(3)
       2
       iex> Abit.Bitmask.set_bits_count(0)
@@ -42,7 +43,8 @@ defmodule Abit.Bitmask do
   @doc """
   Returns bit at `bit_index` in `ingteger`.
 
-  ## Example
+  ## Examples
+
       iex> Abit.Bitmask.bit_at(2, 0)
       0
       iex> Abit.Bitmask.bit_at(2, 1)
@@ -64,7 +66,8 @@ defmodule Abit.Bitmask do
   Sets the bit at `bit_index` in `integer` and
   returns `integer` with the bit set.
 
-  ## Example
+  ## Examples
+
       iex> Abit.Bitmask.set_bit_at(1, 0, 0)
       0
       iex> Abit.Bitmask.set_bit_at(0, 0, 1)
@@ -87,7 +90,8 @@ defmodule Abit.Bitmask do
   @doc """
   Returns the hamming distance of the bits of two integers.
 
-  ## Example
+  ## Examples
+
       iex> Abit.Bitmask.hamming_distance(1, 0)
       1
       iex> Abit.Bitmask.hamming_distance(1, 1023)

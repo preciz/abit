@@ -1,11 +1,12 @@
 defmodule Abit do
   @moduledoc """
-  Use :atomics as a bit array or as an array of counters with n bits per counter in Elixir.
+  Use `:atomics` as a bit array or as an array of counters with N bits per counter in Elixir.
 
   [Erlang atomics documentation](http://erlang.org/doc/man/atomics.html)
 
-  The Abit module (this module) has functions to use an :atomics as a bit array.
-  The Abit.Counter module has functions to create an array of counters and
+  The `Abit` module (this module) has functions to use an :atomics as a bit array.
+
+  The `Abit.Counter` module has functions to create an array of counters and
   manipulate them.
   """
 
@@ -16,13 +17,16 @@ defmodule Abit do
 
   Atomics are 64 bit integers so it is size * 64.
 
-  ## Example
+  ## Examples
 
-      iex> ref = :atomics.new(3, signed: false)
+      iex> ref = :atomics.new(1, signed: false)
       iex> ref |> Abit.bit_count
+      64
+      iex> ref2 = :atomics.new(3, signed: false)
+      iex> ref2 |> Abit.bit_count
       192
   """
-  @spec bit_count(reference) :: non_neg_integer
+  @spec bit_count(reference) :: pos_integer
   def bit_count(ref) when is_reference(ref) do
     %{size: size} = :atomics.info(ref)
 
@@ -85,7 +89,7 @@ defmodule Abit do
   @doc """
   Sets the bit at `bit_index` to `bit` in the atomic `ref`.
 
-  ## Example
+  ## Examples
 
       iex> ref = :atomics.new(1, signed: false)
       iex> ref |> :atomics.put(1, 1)
@@ -127,12 +131,13 @@ defmodule Abit do
   end
 
   @doc """
+  Returns position of bit in `:atomics`.
+
   Returns a 2 tuple containing:
+    * `atomics_index` - the index of the atomics array where the bit is located
+    * `bit_index` - the index of the bit in the integer at `atomics_index`
 
-  `atomics_index` - the index of the atomics array where the bit is located
-  `bit_index` - the index of the bit in the integer at `atomics_index`
-
-  ## Example
+  ## Examples
 
       iex> Abit.bit_position(0)
       {1, 0}
@@ -153,7 +158,7 @@ defmodule Abit do
   @doc """
   Returns bit at `bit_index` in atomic `ref`.
 
-  ## Example
+  ## Examples
 
       iex> ref = :atomics.new(1, signed: false)
       iex> ref |> :atomics.put(1, 3)
@@ -180,7 +185,7 @@ defmodule Abit do
   @doc """
   Returns number of bits set to 1 in atomics array `ref`.
 
-  ## Example
+  ## Examples
 
       iex> ref = :atomics.new(1, signed: false)
       iex> ref |> :atomics.put(1, 3)
@@ -217,6 +222,7 @@ defmodule Abit do
   Raises ArgumentError if the size of `ref_l` and `ref_r` don't equal.
 
   ## Examples
+
       iex> ref_l = :atomics.new(10, signed: false)
       iex> ref_r = :atomics.new(10, signed: false)
       iex> Abit.hamming_distance(ref_l, ref_r)

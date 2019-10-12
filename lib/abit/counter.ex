@@ -1,14 +1,15 @@
 defmodule Abit.Counter do
   @moduledoc """
-  Use atomics as an array of counters with n bits per 64 bit integer.
+  Use `:atomics` as an array of counters with N bits per counter.
+  An `:atomics` is an array of 64 bit integers so the possible counters are below:
 
   Possible counters:
       bits | unsigned value range | signed value range
-      2      0..3                   -2..1
-      4      0..15                  -8..7
-      8      0..255                 -128..127
-      16     0..65535               -32768..32767
-      32     0..4294967295          -2147483648..2147483647
+      2    | 0..3                 | -2..1
+      4    | 0..15                | -8..7
+      8    | 0..255               | -128..127
+      16   | 0..65535             | -32768..32767
+      32   | 0..4294967295        | -2147483648..2147483647
 
   If you need 64 bit counters use:
   [Erlang counters](http://erlang.org/doc/man/counters.html)
@@ -26,22 +27,26 @@ defmodule Abit.Counter do
   @type t :: %__MODULE__{
     atomics_ref: reference,
     signed: boolean,
-    size: non_neg_integer,
+    size: pos_integer,
     counters_bit_size: 2 | 4 | 8 | 16 | 32,
     min: integer,
-    max: non_neg_integer
+    max: pos_integer
   }
 
   @doc """
-  Returns a new %Abit.Counter{} struct.
+  Returns a new `%Abit.Counter{}` struct.
 
-  * `size` - minimum number of counters to have
-  * `counters_bit_size` - how many bits a counter should use
+    * `size` - minimum number of counters to have
+      (if they don't fit exactly to 64 bit at the end, there will be a few more to fully fill the `:atomics`.
+      check the `:size` key in the returned `%Abit.Counter{}` struct for the exact number of counters.)
+    * `counters_bit_size` - how many bits a counter should use
 
-  ## Options:
-  * `signed` - whether to have signed or unsigned counters.
+  ## Options
+
+    * `signed` - whether to have signed or unsigned counters.
 
   ## Examples
+
       Abit.Counter.new(100, 8) # minimum 100 counters; 8 bits signed
       Abit.Counter.new(10_000, 16, signed: false) # minimum 10_000 counters; 16 bits unsigned
   """
@@ -82,6 +87,7 @@ defmodule Abit.Counter do
   Returns the value of counter at `index`.
 
   ## Examples
+
       iex> c = Abit.Counter.new(10, 8)
       iex> c |> Abit.Counter.get(7)
       0
@@ -105,6 +111,7 @@ defmodule Abit.Counter do
   Returns `:ok`.
 
   ## Examples
+
       iex> c = Abit.Counter.new(10, 8)
       iex> c |> Abit.Counter.put(7, -12)
       :ok
@@ -129,11 +136,12 @@ defmodule Abit.Counter do
   end
 
   @doc """
-  Increments the value into the counter at `index`.
+  Increments the value of the counter at `index` with `incr`.
 
   Returns `:ok`.
 
   ## Examples
+
       iex> c = Abit.Counter.new(10, 8)
       iex> c |> Abit.Counter.add(7, -12)
       iex> c |> Abit.Counter.add(7, -12)
