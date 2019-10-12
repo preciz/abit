@@ -14,6 +14,9 @@ defmodule Abit.Counter do
   If you need 64 bit counters use:
   [Erlang counters](http://erlang.org/doc/man/counters.html)
 
+  The option `wrap_around` is set to `false` by default. With these
+  small-ish counters this is a safety default.
+
   While Erlang :atomics are 1 indexed, `Abit.Counter` counters are 0 indexed.
   """
 
@@ -47,7 +50,7 @@ defmodule Abit.Counter do
   ## Options
 
     * `signed` - whether to have signed or unsigned counters. Defaults to `true`.
-    * `wrap_around` - whether countesr should wrap around. Defaults to `false`.
+    * `wrap_around` - whether counters should wrap around. Defaults to `false`.
 
   ## Examples
 
@@ -115,7 +118,7 @@ defmodule Abit.Counter do
   @doc """
   Puts the value into the counter at `index`.
 
-  Returns `{:ok, value}` or `{:error, :value_out_of_bounds}` if
+  Returns `{:ok, {index, final_value}}` or `{:error, :value_out_of_bounds}` if
   option `wrap_around` is `false` and value is out of bounds.
 
   ## Examples
@@ -153,17 +156,16 @@ defmodule Abit.Counter do
   @doc """
   Increments the value of the counter at `index` with `incr`.
 
-  Returns `{:ok, value_after_increment}` or `{:error, :value_out_of_bounds}` if
+  Returns `{:ok, {index, final_value}}` or `{:error, :value_out_of_bounds}` if
   option `wrap_around` is `false` and value is out of bounds.
 
   ## Examples
 
       iex> c = Abit.Counter.new(10, 8)
       iex> c |> Abit.Counter.add(7, -12)
-      iex> c |> Abit.Counter.add(7, -12)
-      {:ok, {7, -24}}
-      iex> c |> Abit.Counter.get(7)
-      -24
+      {:ok, {7, -12}}
+      iex> c |> Abit.Counter.add(7, 36)
+      {:ok, {7, 24}}
   """
   @spec add(t, non_neg_integer, integer) :: :ok
   def add(

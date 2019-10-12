@@ -57,21 +57,34 @@ defmodule Abit.CounterTest do
     end)
   end
 
-  test "wrap around false" do
+  test "wrap_around: false" do
     counter = Counter.new(10, 8)
 
     counter |> Counter.put(0, 127)
-    counter |> Counter.put(1, -128)
-
     assert {:error, :value_out_of_bounds} = counter |> Counter.add(0, 1)
+
+    counter |> Counter.put(1, -128)
     assert {:error, :value_out_of_bounds} = counter |> Counter.add(1, -1)
+  end
+
+  test "wrap_around: true" do
+    counter = Counter.new(10, 8, wrap_around: true)
+
+    counter |> Counter.put(0, 127)
+    assert {:ok, {0, -128}} = counter |> Counter.add(0, 1)
+
+    counter |> Counter.put(1, -128)
+    assert {:ok, {1, 127}} = counter |> Counter.add(1, -1)
   end
 
   test "unsigned counters wrap around correctly" do
     counter = Counter.new(10, 8, signed: false, wrap_around: true)
 
     counter |> Counter.put(0, 255)
-
     assert {:ok, {0, 0}} = counter |> Counter.add(0, 1)
+
+    counter2 = Counter.new(10, 4, signed: false, wrap_around: true)
+    counter2 |> Counter.put(0, 15)
+    assert {:ok, {0, 0}} = counter2 |> Counter.add(0, 1)
   end
 end
