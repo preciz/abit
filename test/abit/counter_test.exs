@@ -43,15 +43,35 @@ defmodule Abit.CounterTest do
   end
 
   test "gets & puts value" do
-    counter = %Counter{} = Counter.new(10, 8)
+    counter = Counter.new(10, 8)
 
-    1..10 |> Enum.each(fn index ->
+    1..10
+    |> Enum.each(fn index ->
       assert 0 = counter |> Counter.get(index)
     end)
 
-    1..10 |> Enum.each(fn n ->
+    1..10
+    |> Enum.each(fn n ->
       assert :ok = counter |> Counter.put(n, n)
       assert n = counter |> Counter.get(n)
     end)
+  end
+
+  test "unsigned counters wrap around correctly" do
+    counter = Counter.new(10, 8, signed: false)
+
+    counter |> Counter.put(0, 255)
+    counter |> Counter.put(1, 255)
+    counter |> Counter.put(2, 255)
+
+    assert 255 == Counter.get(counter, 0)
+    assert 255 == Counter.get(counter, 1)
+    assert 255 == Counter.get(counter, 2)
+
+    counter |> Counter.add(1, 1)
+
+    assert 255 == Counter.get(counter, 0)
+    assert 0 == Counter.get(counter, 1)
+    assert 255 == Counter.get(counter, 2)
   end
 end
