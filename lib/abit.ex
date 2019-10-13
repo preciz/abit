@@ -122,8 +122,8 @@ defmodule Abit do
   Returns position of bit in `:atomics`.
 
   Returns a 2 tuple containing:
-    * `atomics_index` - the index of the atomics array where the bit is located
-    * `bit_index` - the index of the bit in the integer at `atomics_index`
+    * `atomics_index` - the index of the integer in atomics where the bit is located
+    * `bit_index` - the index of the bit in the integer
 
   ## Examples
 
@@ -187,25 +187,20 @@ defmodule Abit do
   def set_bits_count(ref) when is_reference(ref) do
     %{size: size} = ref |> :atomics.info()
 
-    set_bits_count(ref, size, 0)
+    do_set_bits_count(ref, size, 0)
   end
 
-  defp set_bits_count(_, 0, acc), do: acc
+  defp do_set_bits_count(_, 0, acc), do: acc
 
-  defp set_bits_count(ref, index, acc) do
-    count_at_index = Abit.Bitmask.set_bits_count(:atomics.get(ref, index))
+  defp do_set_bits_count(ref, index, acc) do
+    set_bits_count_at_index = Abit.Bitmask.set_bits_count(:atomics.get(ref, index))
 
-    new_acc = acc + count_at_index
-
-    next_index = index - 1
-
-    set_bits_count(ref, next_index, new_acc)
+    do_set_bits_count(ref, index - 1, acc + set_bits_count_at_index)
   end
 
   @doc """
-  Returns the bitwise hamming distance of two `:atomics` references.
-
-  It accepts two `:atomics` references `ref_l` and `ref_r`.
+  Returns the bitwise hamming distance between the two
+  given `:atomics` references `ref_l` and `ref_r`.
 
   Raises ArgumentError if the size of `ref_l` and `ref_r` don't equal.
 
@@ -221,8 +216,8 @@ defmodule Abit do
   """
   @spec hamming_distance(reference, reference) :: non_neg_integer
   def hamming_distance(ref_l, ref_r) when is_reference(ref_l) and is_reference(ref_r) do
-    %{size: ref_l_size} = ref_l |> :atomics.info()
-    %{size: ref_r_size} = ref_r |> :atomics.info()
+    %{size: ref_l_size} = :atomics.info(ref_l)
+    %{size: ref_r_size} = :atomics.info(ref_r)
 
     if ref_l_size != ref_r_size do
       raise ArgumentError,
