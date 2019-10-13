@@ -33,7 +33,7 @@ defmodule Abit.Bitmask do
   end
 
   @doc """
-  Returns bit at `bit_index` in `ingteger`.
+  Returns bit at `bit_index` in the given `integer`.
 
   ## Examples
 
