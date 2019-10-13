@@ -16,7 +16,7 @@ def deps do
 end
 ```
 
-## API
+## API summary
 See [https://hexdocs.pm/abit](https://hexdocs.pm/abit) for full documentation.
 
 ### Abit - use `:atomics` as a bit array
