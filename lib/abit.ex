@@ -18,17 +18,17 @@ defmodule Abit do
   @doc """
   Returns total count of bits in atomics `ref`.
 
-  `:atomics` are 64 bit integers so total bits
-  count is array size * 64.
+  `:atomics` are 64 bit integers so total
+  count of bits is size * 64.
 
   ## Examples
 
       iex> ref = :atomics.new(1, signed: false)
-      iex> ref |> Abit.bit_count
+      iex> Abit.bit_count(ref)
       64
-      iex> ref2 = :atomics.new(3, signed: false)
-      iex> ref2 |> Abit.bit_count
-      192
+      iex> ref2 = :atomics.new(2, signed: false)
+      iex> Abit.bit_count(ref2)
+      128
   """
   @spec bit_count(reference) :: pos_integer
   def bit_count(ref) when is_reference(ref) do
@@ -62,31 +62,29 @@ defmodule Abit do
   @doc """
   Bit intersection of atomics using Bitwise AND operator.
 
-  After the operation `ref_a` will be returned.
+  Returns `ref_a` mutated.
   """
   @spec intersect(reference, reference) :: reference
   def intersect(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     %{size: size} = ref_a |> :atomics.info()
 
-    intersect(ref_a, ref_b, size)
+    do_intersect(ref_a, ref_b, size)
   end
 
-  defp intersect(ref_a, _, 0), do: ref_a
+  defp do_intersect(ref_a, _, 0), do: ref_a
 
-  defp intersect(ref_a, ref_b, index) do
-    :atomics.put(
-      ref_a,
-      index,
-      :atomics.get(ref_a, index) &&& :atomics.get(ref_b, index)
-    )
+  defp do_intersect(ref_a, ref_b, index) do
+    intersected_value = :atomics.get(ref_a, index) &&& :atomics.get(ref_b, index)
 
-    next_index = index - 1
+    :atomics.put(ref_a, index, intersected_value)
 
-    intersect(ref_a, ref_b, next_index)
+    do_intersect(ref_a, ref_b, index - 1)
   end
 
   @doc """
-  Sets the bit at `bit_index` to `bit` in the atomic `ref`.
+  Sets the bit at `bit_index` to `bit` in the atomics `ref`.
+
+  Returns `:ok`.
 
   ## Examples
 
