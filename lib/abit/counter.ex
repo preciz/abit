@@ -135,7 +135,7 @@ defmodule Abit.Counter do
       iex> c |> Abit.Counter.put(7, 128)
       {:error, :value_out_of_bounds}
   """
-  @spec put(t, non_neg_integer, integer) :: :ok
+  @spec put(t, non_neg_integer, integer) :: {:ok, {non_neg_integer, integer}} | {:error, :value_out_of_bounds}
   def put(%Counter{wrap_around: false, min: min, max: max}, _, value)
       when value < min or value > max do
     {:error, :value_out_of_bounds}
@@ -175,7 +175,7 @@ defmodule Abit.Counter do
       iex> c |> Abit.Counter.put(1, 1000)
       {:error, :value_out_of_bounds}
   """
-  @spec add(t, non_neg_integer, integer) :: :ok
+  @spec add(t, non_neg_integer, integer) :: {:ok, {non_neg_integer, integer}} | {:error, :value_out_of_bounds}
   def add(
         counter = %Counter{
           atomics_ref: atomics_ref,
