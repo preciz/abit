@@ -6,7 +6,7 @@ defmodule Abit.Bitmask do
   import Bitwise
 
   @doc """
-  Returns the count of bits set to 1 in `int` integer.
+  Returns the count of bits set to 1 in the given integer `int`.
 
   ## Examples
 
@@ -20,23 +20,25 @@ defmodule Abit.Bitmask do
       10
   """
   @spec set_bits_count(integer) :: non_neg_integer
-  def set_bits_count(int), do: set_bits_count(int, 0)
+  def set_bits_count(int) when is_integer(int) do
+    do_set_bits_count(int, 0)
+  end
 
-  defp set_bits_count(0, acc), do: acc
+  defp do_set_bits_count(0, acc), do: acc
 
-  defp set_bits_count(int, acc) when is_integer(int) and is_integer(acc) do
+  defp do_set_bits_count(int, acc) do
     case int &&& 1 do
       0 ->
         int = int >>> 1
 
-        set_bits_count(int, acc)
+        do_set_bits_count(int, acc)
 
       1 ->
         int = int >>> 1
 
         new_acc = acc + 1
 
-        set_bits_count(int, new_acc)
+        do_set_bits_count(int, new_acc)
     end
   end
 
