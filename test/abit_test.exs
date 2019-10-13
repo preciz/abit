@@ -2,6 +2,24 @@ defmodule AbitTest do
   use ExUnit.Case
   doctest Abit
 
+  test "set_bit_at" do
+    ref = :atomics.new(10, signed: false)
+
+    0..9
+    |> Enum.each(fn index ->
+      0..63
+      |> Enum.each(fn pos ->
+        bit = (index * 64) + pos
+
+        ref |> Abit.set_bit_at(bit, 1)
+
+        assert :atomics.get(ref, index + 1) == round(:math.pow(2, pos))
+
+        ref |> Abit.set_bit_at(bit, 0)
+      end)
+    end)
+  end
+
   test "merge of 2 atomics bit arrays returns left reference" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
