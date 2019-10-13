@@ -4,11 +4,11 @@ defmodule Abit do
 
   [Erlang atomics documentation](http://erlang.org/doc/man/atomics.html)
 
-  The `Abit` module (this module) has functions to use an `:atomics` as a bit array.
+  The `Abit` module (this module) has functions to use `:atomics` as a bit array.
   The bit array is zero indexed.
 
-  The `Abit.Counter` functions to use `:atomics` as an array of N-bit
-  counters and manipulate them.
+  The `Abit.Counter` module has functions to use `:atomics` as an array of N-bit
+  counters.
 
   The `Abit.Bitmask` functions help working with bitmasks.
   """
@@ -16,7 +16,7 @@ defmodule Abit do
   import Bitwise
 
   @doc """
-  Returns count of total bits in atomics `ref`.
+  Returns total count of bits in atomics `ref`.
 
   `:atomics` are 64 bit integers so total bits
   count is array size * 64.
@@ -32,9 +32,7 @@ defmodule Abit do
   """
   @spec bit_count(reference) :: pos_integer
   def bit_count(ref) when is_reference(ref) do
-    %{size: size} = :atomics.info(ref)
-
-    size * 64
+    :atomics.info(ref).size * 64
   end
 
   @doc """
