@@ -89,7 +89,7 @@ defmodule Abit do
   ## Examples
 
       iex> ref = :atomics.new(1, signed: false)
-      iex> ref |> :atomics.put(1, 1)
+      iex> ref |> Abit.set_bit_at(0, 1)
       iex> ref |> :atomics.get(1)
       1
       iex> ref |> Abit.set_bit_at(0, 0)
@@ -101,18 +101,12 @@ defmodule Abit do
   def set_bit_at(ref, bit_index, bit) when is_reference(ref) and bit in [0, 1] do
     {atomics_index, integer_bit_index} = bit_position(bit_index)
 
-    case bit_at(ref, bit_index) do
-      ^bit ->
-        :ok
+    current_value = :atomics.get(ref, atomics_index)
 
-      _else ->
-        do_set_bit_at(ref, atomics_index, integer_bit_index, bit, nil)
-    end
+    do_set_bit_at(ref, atomics_index, integer_bit_index, bit, current_value)
   end
 
   defp do_set_bit_at(ref, atomics_index, integer_bit_index, bit, current_value) do
-    current_value = current_value || :atomics.get(ref, atomics_index)
-
     next_value = Abit.Bitmask.set_bit_at(current_value, integer_bit_index, bit)
 
     case :atomics.compare_exchange(ref, atomics_index, current_value, next_value) do
@@ -120,10 +114,7 @@ defmodule Abit do
         :ok
 
       non_matching_current_value ->
-        case Abit.Bitmask.bit_at(non_matching_current_value, integer_bit_index) do
-          ^bit -> :ok
-          _else -> do_set_bit_at(ref, atomics_index, integer_bit_index, bit, non_matching_current_value)
-        end
+        do_set_bit_at(ref, atomics_index, integer_bit_index, bit, non_matching_current_value)
     end
   end
 
