@@ -27,19 +27,9 @@ defmodule Abit.Bitmask do
   defp do_set_bits_count(0, acc), do: acc
 
   defp do_set_bits_count(int, acc) do
-    case int &&& 1 do
-      0 ->
-        int = int >>> 1
+    new_acc = acc + (int &&& 1)
 
-        do_set_bits_count(int, acc)
-
-      1 ->
-        int = int >>> 1
-
-        new_acc = acc + 1
-
-        do_set_bits_count(int, new_acc)
-    end
+    do_set_bits_count(int >>> 1, new_acc)
   end
 
   @doc """
