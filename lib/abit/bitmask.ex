@@ -55,8 +55,7 @@ defmodule Abit.Bitmask do
   end
 
   @doc """
-  Sets the bit at `bit_index` in `integer` and
-  returns `integer` with the bit set.
+  Sets the bit at `bit_index` in `integer` and returns it.
 
   ## Examples
 
@@ -80,10 +79,13 @@ defmodule Abit.Bitmask do
   end
 
   @doc """
-  Returns the hamming distance of the bits of two integers.
+  Returns the bitwise hamming distance between the
+  given integers `int_l` and `int_r`.
 
   ## Examples
 
+      iex> Abit.Bitmask.hamming_distance(1, 1)
+      0
       iex> Abit.Bitmask.hamming_distance(1, 0)
       1
       iex> Abit.Bitmask.hamming_distance(1, 1023)
