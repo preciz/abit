@@ -14,11 +14,13 @@ defmodule Abit.Counter do
   If you need 64 bit counters use:
   [Erlang counters](http://erlang.org/doc/man/counters.html)
 
-  The option `wrap_around` is set to `false` by default. With these
-  small-ish counters this is a safety default. If set to true the `add/3`
-  and `put/3` functions will never return `{:error, :value_out_of_bounds}`.
+  The option `:wrap_around` is set to `false` by default. With these
+  small-ish counters this is a safe default.
+  When `:wrap_around` is `false` when using `put/3` or `add/3` the error tuple
+  `{:error, :value_out_of_bounds}` will be returned instead of wrap around and
+  the stored counter value will not change.
 
-  While Erlang :atomics are 1 indexed, `Abit.Counter` counters are 0 indexed.
+  While Erlang `:atomics` are 1 indexed, `Abit.Counter` counters are 0 indexed.
   """
 
   @bit_sizes [2, 4, 8, 16, 32]
@@ -44,20 +46,20 @@ defmodule Abit.Counter do
   Returns a new `%Abit.Counter{}` struct.
 
     * `size` - minimum number of counters to have
-      (if they don't fit exactly to 64 bit at the end, there will be a few more to fully fill the `:atomics`.
+      (if they don't fill exactly a multiple 64 bit integers, there will be more to fill the `:atomics`,
       check the `:size` key in the returned `%Abit.Counter{}` struct for the exact number of counters.)
     * `counters_bit_size` - how many bits a counter should use
 
   ## Options
 
-    * `signed` - whether to have signed or unsigned counters. Defaults to `true`.
-    * `wrap_around` - whether counters should wrap around. Defaults to `false`.
+    * `:signed` - whether to have signed or unsigned counters. Defaults to `true`.
+    * `:wrap_around` - whether counters should wrap around. Defaults to `false`.
 
   ## Examples
 
       Abit.Counter.new(100, 8) # minimum 100 counters; 8 bits signed
       Abit.Counter.new(10_000, 16, signed: false) # minimum 10_000 counters; 16 bits unsigned
-      Abit.Counter.new(10_000, 16, wrap_around: false) # don't wrap around counters
+      Abit.Counter.new(10_000, 16, wrap_around: false) # don't wrap around
   """
   @spec new(non_neg_integer, 2 | 4 | 8 | 16 | 32, list) :: t
   def new(size, counters_bit_size, options \\ [])
@@ -69,6 +71,7 @@ defmodule Abit.Counter do
             "You can't create an %Abit.Counter{} with counters_bit_size #{counters_bit_size}." <>
               "Possible values are #{inspect(@bit_sizes)}"
     end
+
 
     signed = options |> Keyword.get(:signed, true)
     wrap_around = options |> Keyword.get(:wrap_around, false)
