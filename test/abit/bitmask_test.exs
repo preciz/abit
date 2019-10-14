@@ -28,6 +28,8 @@ defmodule Abit.BitmaskTest do
 
   test "set_bit_at" do
     assert 0 == Bitmask.set_bit_at(1, 0, 0)
+    assert 2 == Bitmask.set_bit_at(3, 0, 0)
+    assert 12 == Bitmask.set_bit_at(14, 1, 0)
     assert 1 == Bitmask.set_bit_at(0, 0, 1)
     assert 2 == Bitmask.set_bit_at(0, 1, 1)
     assert 8 == Bitmask.set_bit_at(0, 3, 1)
