@@ -1,5 +1,8 @@
 # Changelog for Abit
 
+## v0.2.1
+  * Performance improvements for the Abit & Abit.Bitmask module functions
+
 ## v0.2.0
 
 ### Abit
