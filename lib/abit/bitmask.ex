@@ -48,9 +48,9 @@ defmodule Abit.Bitmask do
   """
   @spec bit_at(integer, non_neg_integer) :: 0 | 1
   def bit_at(integer, bit_index) when is_integer(integer) and is_integer(bit_index) do
-    case integer ||| 1 <<< bit_index do
-      ^integer -> 1
-      _else -> 0
+    case integer &&& (1 <<< bit_index) do
+      0 -> 0
+      _else -> 1
     end
   end
 
