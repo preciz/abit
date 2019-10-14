@@ -67,11 +67,8 @@ defmodule Abit.Bitmask do
       4
   """
   @spec set_bit_at(integer, non_neg_integer, 0 | 1) :: integer
-  def set_bit_at(integer, bit_index, 0) do
-    case bit_at(integer, bit_index) do
-      0 -> integer
-      1 -> integer ^^^ (1 <<< bit_index)
-    end
+  def set_bit_at2(integer, bit_index, 0) do
+    integer &&& bnot(1 <<< bit_index)
   end
 
   def set_bit_at(integer, bit_index, 1) do
