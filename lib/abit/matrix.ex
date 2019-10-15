@@ -35,13 +35,12 @@ defmodule Abit.Matrix do
     seed_fun = Keyword.get(options, :seed_fun, nil)
     signed = Keyword.get(options, :signed, true)
 
-    size = m * n
-    ref = :atomics.new(size, signed: signed)
+    atomics_ref = :atomics.new(m * n, signed: signed)
 
-    matrix = %Matrix{atomics_ref: ref, m: m, n: n}
+    matrix = %Matrix{atomics_ref: atomics_ref, m: m, n: n}
 
     if seed_fun do
-      for index <- 1..size do
+      for index <- 1..(m * n) do
         position = index_to_position(matrix, index)
 
         value = seed_fun.(position)
