@@ -2,7 +2,7 @@ defmodule Abit.Matrix do
   @moduledoc """
   Use `:atomics` as an M x N matrix.
   """
-  @moduledoc since: 2.2
+  @moduledoc since: "0.2.2"
 
   alias Abit.Matrix
 
