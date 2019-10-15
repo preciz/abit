@@ -14,7 +14,7 @@ defmodule Abit.Matrix do
           n: pos_integer
         }
 
-  @type position :: {non_neg_integer, non_neg_integer}
+  @type position :: {row :: non_neg_integer, col :: non_neg_integer}
 
   @doc """
   Returns a new `%Abit.Matrix{}` struct.
@@ -22,7 +22,7 @@ defmodule Abit.Matrix do
   ## Options
     * `:seed_fun` - a function that receives a 2-tuple `{row, col}`
   as argument and returns the initial value for the position
-    * `:signed` - whether to have signed 64bit integers or unsigned
+    * `:signed` - whether to have signed or unsigned 64bit integers
 
   ## Examples
 
@@ -54,7 +54,7 @@ defmodule Abit.Matrix do
   end
 
   @doc """
-  Returns a 2-tuple with row & col position given atomics `index`.
+  Returns a position tuple for the given atomics `index`.
 
   ## Examples
 
@@ -112,8 +112,6 @@ defmodule Abit.Matrix do
       iex> matrix = Abit.Matrix.new(10, 10)
       iex> matrix |> Abit.Matrix.put({1, 3}, 5)
       :ok
-      iex> matrix |> Abit.Matrix.get({1, 3})
-      5
   """
   @spec put(t, position, integer) :: :ok
   def put(%Matrix{atomics_ref: atomics_ref} = matrix, position, value) when is_integer(value) do
