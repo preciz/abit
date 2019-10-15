@@ -1,7 +1,10 @@
 # Changelog for Abit
 
+## v0.2.2
+  * Feature - `Abit.Matrix` module for working with atomics as an M x N matrix.
+
 ## v0.2.1
-  * Performance improvements for the Abit & Abit.Bitmask module functions
+  * Performance - improvements for the `Abit` & `Abit.Bitmask` module functions
 
 ## v0.2.0
 
