@@ -103,7 +103,7 @@ defmodule Abit.Matrix do
   end
 
   @doc """
-  Puts value into `matrix` at `position`.
+  Puts `value` into `matrix` at `position`.
 
   Returns `:ok`
 
@@ -118,5 +118,28 @@ defmodule Abit.Matrix do
     index = position_to_index(matrix, position)
 
     :atomics.put(atomics_ref, index, value)
+  end
+
+  @doc """
+  Adds `incr` to value at `position` in matrix.
+
+  Returns final value at `position`.
+
+  ## Examples
+
+      iex> matrix = Abit.Matrix.new(10, 10)
+      iex> matrix |> Abit.Matrix.add({0, 0}, 2)
+      2
+      iex> matrix |> Abit.Matrix.add({0, 0}, 2)
+      4
+      iex> matrix |> Abit.Matrix.add({0, 0}, -8)
+      -4
+  """
+  @doc since: "0.2.3"
+  @spec add(t, position, integer) :: integer
+  def add(%Matrix{atomics_ref: atomics_ref} = matrix, position, incr) when is_integer(incr) do
+    index = position_to_index(matrix, position)
+
+    :atomics.add_get(atomics_ref, index, incr)
   end
 end
