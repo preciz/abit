@@ -250,4 +250,24 @@ defmodule Abit do
 
     Abit.Bitmask.hamming_distance(ref_l_value, ref_r_value)
   end
+
+  @doc """
+  Returns a flat list of every atomic value converted
+  into a list of bits from `ref` atomics reference.
+
+  ## Examples
+      ref = :atomics.new(10, signed: false)
+      ref |> Abit.to_list
+      [0, 0, 0, 0, 0, ...]
+  """
+  @doc since: "0.2.3"
+  @spec to_list(reference) :: list(0 | 1)
+  def to_list(ref) when is_reference(ref) do
+    size = :atomics.info(ref).size
+
+    (1..size)
+    |> Enum.flat_map(fn index ->
+      :atomics.get(ref, index) |> Abit.Bitmask.to_list(64)
+    end)
+  end
 end
