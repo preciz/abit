@@ -125,9 +125,9 @@ defmodule Abit.Matrix do
   end
 
   @doc """
-  Adds `incr` to value at `position` in matrix.
+  Atomic addition and return of the result.
 
-  Returns final value at `position`.
+  Adds `incr` to value at `position` and return result.
 
   ## Examples
 
