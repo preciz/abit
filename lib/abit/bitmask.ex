@@ -94,4 +94,31 @@ defmodule Abit.Bitmask do
   def hamming_distance(int_l, int_r) when is_integer(int_l) and is_integer(int_r) do
     (int_l ^^^ int_r) |> set_bits_count
   end
+
+  @doc """
+  Converts the given `integer` to a list of bits.
+
+  `size` is the size of the bitstring you want the integer to be
+  converted to before creating a list from it.
+
+  ## Examples
+
+      iex> Abit.Bitmask.to_list(1, 1)
+      [1]
+      iex> Abit.Bitmask.to_list(1, 2)
+      [0, 1]
+      iex> Abit.Bitmask.to_list(214311324231232211111, 64)
+      [1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1]
+  """
+  @doc since: "0.2.3"
+  @spec to_list(integer, pos_integer) :: list(0 | 1)
+  def to_list(integer, size) when is_integer(integer) and is_integer(size) and size > 0 do
+    do_to_list(<<integer::size(size)>>)
+  end
+
+  defp do_to_list(<<bit::1, rest::bitstring>>) do
+    [bit | do_to_list(rest)]
+  end
+
+  defp do_to_list(<<>>), do: []
 end
