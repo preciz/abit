@@ -64,6 +64,10 @@ defmodule Abit.Matrix do
   """
   @spec index_to_position(t, pos_integer) :: position
   def index_to_position(%Matrix{n: n}, index) when is_integer(index) do
+    index_to_position(n, index)
+  end
+
+  def index_to_position(n, index) do
     index = index - 1
 
     {div(index, n), rem(index, n)}
@@ -251,5 +255,46 @@ defmodule Abit.Matrix do
 
   defp do_sum(atomics_ref, index, acc) do
     do_sum(atomics_ref, index - 1, acc + :atomics.get(atomics_ref, index))
+  end
+
+  @doc """
+  Applies the given `fun` function to all elements of `matrix`.
+
+  If arity of `fun` is 1 it receives the integer as single argument.
+  If arity of `fun` is 2 it receives the integer as first and
+  position tuple as the second argument.
+
+  ## Examples
+      iex> matrix = Abit.Matrix.new(10, 10)
+      iex> matrix |> Abit.Matrix.apply(fn int -> int + 2 end)
+      iex> matrix |> Abit.Matrix.get({0, 0})
+      2
+      iex> matrix = Abit.Matrix.new(10, 10)
+      iex> matrix |> Abit.Matrix.apply(fn _int, {row, col} -> row * col end)
+      iex> matrix |> Abit.Matrix.get({9, 9})
+      81
+  """
+  @doc since: "0.2.3"
+  @spec apply(t, (integer -> integer) | (integer, position -> integer)) :: :ok
+  def apply(%Matrix{atomics_ref: atomics_ref, n: n} = matrix, fun) when is_function(fun, 1) or is_function(fun, 2) do
+    last_index = size(matrix)
+
+    fun_arity = Function.info(fun)[:arity]
+
+    do_apply(atomics_ref, fun_arity, n, last_index, fun)
+  end
+
+  defp do_apply(_, _, _, 0, _), do: :ok
+
+  defp do_apply(atomics_ref, fun_arity, n, index, fun) do
+    value =
+      case fun_arity do
+        1 -> fun.(:atomics.get(atomics_ref, index))
+        2 -> fun.(:atomics.get(atomics_ref, index), index_to_position(n, index))
+      end
+
+    :atomics.put(atomics_ref, index, value)
+
+    do_apply(atomics_ref, fun_arity, n, index - 1, fun)
   end
 end
