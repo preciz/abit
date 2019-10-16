@@ -75,7 +75,7 @@ defmodule Abit.Matrix do
 
   @doc """
   Returns atomics index corresponding to the `position`
-  in the given `%Abit.Matrix{}` struct.
+  tuple in the given `%Abit.Matrix{}` struct.
 
   ## Examples
 
