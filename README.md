@@ -34,9 +34,12 @@ See [https://hexdocs.pm/abit](https://hexdocs.pm/abit) for full documentation.
 * `Abit.Counter.put/3` - Puts the value into counter at the given index.
 * `Abit.Counter.add/3` - Adds the increment to counter at the given index.
 ### Abit.Matrix - use `:atomics` as an M x N matrix
-* `Abit.Matrix.new/2` - Create new matrix. Returns %Abit.Matrix{} struct.
-* `Abit.Matrix.get/2` - Returns the value at the given position in matrix.
-* `Abit.Matrix.put/3` - Puts the given value into matrix at the given position.
+* `Abit.Matrix.new/2` - Create new matrix %Abit.Matrix{} struct.
+* `Abit.Matrix.get/2` - Returns the integer at the given position.
+* `Abit.Matrix.put/3` - Puts the given integer into the given position.
+* `Abit.Matrix.add/3` - Adds the given integer into the given position atomically.
+* `Abit.Matrix.exchange/3` - Exchanges the given integer at the given position atomically.
+* `Abit.Matrix.compare_exchange/4` - Compares & exchanges the given integer at the given position atomically.
 * `Abit.Matrix.index_to_position/2` - Converts the given atomics index to position tuple.
 * `Abit.Matrix.position_to_index/2` - Converts the given position tuple to atomics index.
 ### Abit.Bitmask - helper functions for bitmasks
