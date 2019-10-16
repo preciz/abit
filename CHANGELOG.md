@@ -1,5 +1,11 @@
 # Changelog for Abit
 
+## v0.2.3
+  * Feature - `Abit.Matrix` implements `add/3`, `exchange/3`, `compare_exchange/4`, `min/1`, `max/1`, ... functions.
+  * Feature - `Abit.Matrix` implements the `Enumberable` protocol
+  * Feature - `Abit.Bitmask` implements `to_list/2`function.
+  * Feature - `Abit` implements `to_list/1` function.
+
 ## v0.2.2
   * Feature - `Abit.Matrix` module for working with atomics as an M x N matrix.
 
