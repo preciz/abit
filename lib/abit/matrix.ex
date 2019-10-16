@@ -297,4 +297,47 @@ defmodule Abit.Matrix do
 
     do_apply(atomics_ref, fun_arity, n, index - 1, fun)
   end
+
+  defimpl Enumerable do
+    @moduledoc false
+
+    alias Abit.Matrix
+
+    def count(%Matrix{atomics_ref: atomics_ref}) do
+      {:ok, :atomics.info(atomics_ref).size}
+    end
+
+    def member?(%Matrix{atomics_ref: atomics_ref}, int) when is_integer(int) do
+      {:ok, Abit.Atomics.member?(atomics_ref, int)}
+    end
+
+    def slice(%Matrix{atomics_ref: atomics_ref}) do
+      {
+        :ok,
+        :atomics.info(atomics_ref).size,
+        fn start, length ->
+          do_slice(atomics_ref, start + 1, length)
+        end
+      }
+    end
+
+    defp do_slice(_, _, 0), do: []
+
+    defp do_slice(atomics_ref, index, length) do
+      [:atomics.get(atomics_ref, index) | do_slice(atomics_ref, index + 1, length - 1)]
+    end
+
+    def reduce(%Matrix{atomics_ref: atomics_ref}, acc, fun) do
+      size = :atomics.info(atomics_ref).size
+
+      do_reduce({atomics_ref, 0, size}, acc, fun)
+    end
+
+    def do_reduce(_, {:halt, acc}, _fun), do: {:halted, acc}
+    def do_reduce(tuple, {:suspend, acc}, fun), do: {:suspended, acc, &do_reduce(tuple, &1, fun)}
+    def do_reduce({_, size, size}, {:cont, acc}, _fun), do: {:done, acc}
+    def do_reduce({atomics_ref, index, size}, {:cont, acc}, fun) do
+      do_reduce({atomics_ref, index + 1, size}, fun.(:atomics.get(atomics_ref, index + 1), acc), fun)
+    end
+  end
 end
