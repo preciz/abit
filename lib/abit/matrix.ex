@@ -148,6 +148,30 @@ defmodule Abit.Matrix do
   end
 
   @doc """
+  Atomically compares the value at `position` with `expected` ,
+  and if those are equal, sets value at `position` to `desired`.
+
+  Returns :ok if `desired` was written.
+  Returns the actual value at `position` if it does not equal to `desired`.
+
+  ## Examples
+
+      iex> matrix = Abit.Matrix.new(10, 10)
+      iex> matrix |> Abit.Matrix.compare_exchange({0, 0}, 0, -10)
+      :ok
+      iex> matrix |> Abit.Matrix.compare_exchange({0, 0}, 3, 10)
+      -10
+  """
+  @doc since: "0.2.3"
+  @spec compare_exchange(t, position, integer, integer) :: :ok | integer
+  def compare_exchange(%Matrix{atomics_ref: atomics_ref} = matrix, position, expected, desired)
+      when is_integer(expected) and is_integer(desired) do
+    index = position_to_index(matrix, position)
+
+    :atomics.compare_exchange(atomics_ref, index, expected, desired)
+  end
+
+  @doc """
   Atomically replaces value at `position` with `value` and
   returns the value it had before.
 
@@ -160,7 +184,8 @@ defmodule Abit.Matrix do
       -10
   """
   @spec exchange(t, position, integer) :: integer
-  def exchange(%Matrix{atomics_ref: atomics_ref} = matrix, position, value) when is_integer(value) do
+  def exchange(%Matrix{atomics_ref: atomics_ref} = matrix, position, value)
+      when is_integer(value) do
     index = position_to_index(matrix, position)
 
     :atomics.exchange(atomics_ref, index, value)
