@@ -142,4 +142,114 @@ defmodule Abit.Matrix do
 
     :atomics.add_get(atomics_ref, index, incr)
   end
+
+  @doc """
+  Returns size (rows * columns) of matrix.
+
+  ## Examples
+
+      iex> matrix = Abit.Matrix.new(5, 5)
+      iex> matrix |> Abit.Matrix.size()
+      25
+  """
+  @doc since: "0.2.3"
+  @spec size(t) :: pos_integer
+  def size(%Matrix{atomics_ref: atomics_ref}) do
+    :atomics.info(atomics_ref).size
+  end
+
+  @doc """
+  Returns row count of matrix.
+
+  ## Examples
+
+      iex> matrix = Abit.Matrix.new(4, 8)
+      iex> matrix |> Abit.Matrix.rows()
+      4
+  """
+  @doc since: "0.2.3"
+  @spec rows(t) :: pos_integer
+  def rows(%Matrix{m: m}), do: m
+
+  @doc """
+  Returns column count of matrix.
+
+  ## Examples
+
+      iex> matrix = Abit.Matrix.new(4, 8)
+      iex> matrix |> Abit.Matrix.columns()
+      8
+  """
+  @doc since: "0.2.3"
+  @spec columns(t) :: pos_integer
+  def columns(%Matrix{n: n}), do: n
+
+  @doc """
+  Returns smallest integer in `matrix`.
+
+  ## Examples
+
+      iex> matrix = Abit.Matrix.new(10, 10, seed_fun: fn _ -> 7 end)
+      iex> matrix |> Abit.Matrix.min()
+      7
+  """
+  @doc since: "0.2.3"
+  @spec min(t) :: integer
+  def min(%Matrix{atomics_ref: atomics_ref} = matrix) do
+    last_index = size(matrix)
+
+    do_min(atomics_ref, last_index - 1, :atomics.get(atomics_ref, last_index))
+  end
+
+  defp do_min(_, 0, acc), do: acc
+
+  defp do_min(atomics_ref, index, acc) do
+    do_min(atomics_ref, index - 1, min(acc, :atomics.get(atomics_ref, index)))
+  end
+
+  @doc """
+  Returns largest integer in `matrix`.
+
+  ## Examples
+
+      iex> matrix = Abit.Matrix.new(10, 10, seed_fun: fn {row, col} -> row * col end)
+      iex> matrix |> Abit.Matrix.max()
+      81
+  """
+  @doc since: "0.2.3"
+  @spec max(t) :: integer
+  def max(%Matrix{atomics_ref: atomics_ref} = matrix) do
+    last_index = size(matrix)
+
+    do_max(atomics_ref, last_index - 1, :atomics.get(atomics_ref, last_index))
+  end
+
+  defp do_max(_, 0, acc), do: acc
+
+  defp do_max(atomics_ref, index, acc) do
+    do_max(atomics_ref, index - 1, max(acc, :atomics.get(atomics_ref, index)))
+  end
+
+  @doc """
+  Returns sum of integers in `matrix`.
+
+  ## Examples
+
+      iex> matrix = Abit.Matrix.new(10, 10, seed_fun: fn {row, col} -> row * col end)
+      iex> matrix |> Abit.Matrix.sum()
+      2025
+  """
+  @doc since: "0.2.3"
+  @spec sum(t) :: integer
+  def sum(%Matrix{atomics_ref: atomics_ref} = matrix) do
+    last_index = size(matrix)
+
+    do_sum(atomics_ref, last_index - 1, :atomics.get(atomics_ref, last_index))
+  end
+
+  defp do_sum(_, 0, acc), do: acc
+
+  defp do_sum(atomics_ref, index, acc) do
+    do_sum(atomics_ref, index - 1, acc + :atomics.get(atomics_ref, index))
+  end
 end
