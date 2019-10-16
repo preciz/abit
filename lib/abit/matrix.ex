@@ -204,7 +204,7 @@ defmodule Abit.Matrix do
   defp do_min(_, 0, acc), do: acc
 
   defp do_min(atomics_ref, index, acc) do
-    do_min(atomics_ref, index - 1, min(acc, :atomics.get(atomics_ref, index)))
+    do_min(atomics_ref, index - 1, Kernel.min(acc, :atomics.get(atomics_ref, index)))
   end
 
   @doc """
@@ -227,7 +227,7 @@ defmodule Abit.Matrix do
   defp do_max(_, 0, acc), do: acc
 
   defp do_max(atomics_ref, index, acc) do
-    do_max(atomics_ref, index - 1, max(acc, :atomics.get(atomics_ref, index)))
+    do_max(atomics_ref, index - 1, Kernel.max(acc, :atomics.get(atomics_ref, index)))
   end
 
   @doc """
