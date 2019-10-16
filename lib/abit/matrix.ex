@@ -276,7 +276,8 @@ defmodule Abit.Matrix do
   """
   @doc since: "0.2.3"
   @spec apply(t, (integer -> integer) | (integer, position -> integer)) :: :ok
-  def apply(%Matrix{atomics_ref: atomics_ref, n: n} = matrix, fun) when is_function(fun, 1) or is_function(fun, 2) do
+  def apply(%Matrix{atomics_ref: atomics_ref, n: n} = matrix, fun)
+      when is_function(fun, 1) or is_function(fun, 2) do
     last_index = size(matrix)
 
     fun_arity = Function.info(fun)[:arity]
@@ -361,8 +362,13 @@ defmodule Abit.Matrix do
     def do_reduce(_, {:halt, acc}, _fun), do: {:halted, acc}
     def do_reduce(tuple, {:suspend, acc}, fun), do: {:suspended, acc, &do_reduce(tuple, &1, fun)}
     def do_reduce({_, size, size}, {:cont, acc}, _fun), do: {:done, acc}
+
     def do_reduce({atomics_ref, index, size}, {:cont, acc}, fun) do
-      do_reduce({atomics_ref, index + 1, size}, fun.(:atomics.get(atomics_ref, index + 1), acc), fun)
+      do_reduce(
+        {atomics_ref, index + 1, size},
+        fun.(:atomics.get(atomics_ref, index + 1), acc),
+        fun
+      )
     end
   end
 end
