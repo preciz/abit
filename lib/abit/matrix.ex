@@ -148,6 +148,25 @@ defmodule Abit.Matrix do
   end
 
   @doc """
+  Atomically replaces value at `position` with `value` and
+  returns the value it had before.
+
+  ## Examples
+
+      iex> matrix = Abit.Matrix.new(10, 10)
+      iex> matrix |> Abit.Matrix.exchange({0, 0}, -10)
+      0
+      iex> matrix |> Abit.Matrix.exchange({0, 0}, -15)
+      -10
+  """
+  @spec exchange(t, position, integer) :: integer
+  def exchange(%Matrix{atomics_ref: atomics_ref} = matrix, position, value) when is_integer(value) do
+    index = position_to_index(matrix, position)
+
+    :atomics.exchange(atomics_ref, index, value)
+  end
+
+  @doc """
   Returns size (rows * columns) of matrix.
 
   ## Examples
