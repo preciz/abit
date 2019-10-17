@@ -348,15 +348,15 @@ defmodule Abit.Matrix do
 
   ## Examples
 
-  iex> m = Abit.Matrix.new(5, 5, seed_fun: fn {row, col} -> row * col end)
-  iex> Abit.Matrix.to_list_of_lists(m)
-  [
-    [0, 0, 0, 0, 0],
-    [0, 1, 2, 3, 4],
-    [0, 2, 4, 6, 8],
-    [0, 3, 6, 9, 12],
-    [0, 4, 8, 12, 16]
-  ]
+      iex> m = Abit.Matrix.new(5, 5, seed_fun: fn {row, col} -> row * col end)
+      iex> Abit.Matrix.to_list_of_lists(m)
+      [
+        [0, 0, 0, 0, 0],
+        [0, 1, 2, 3, 4],
+        [0, 2, 4, 6, 8],
+        [0, 3, 6, 9, 12],
+        [0, 4, 8, 12, 16]
+      ]
   """
   @spec to_list_of_lists(t) :: list(list(integer))
   @doc since: "0.2.3"
