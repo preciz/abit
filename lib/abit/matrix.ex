@@ -1,6 +1,15 @@
 defmodule Abit.Matrix do
   @moduledoc """
   Use `:atomics` as an M x N matrix.
+
+  ## Enumerable protocol
+
+  `Abit.Matrix` implements the Enumerable protocol, so all Enum functions can be used:
+
+      iex> m = Abit.Matrix.new(10, 10)
+      iex> m |> Abit.Matrix.put({0, 0}, 8)
+      iex> m |> Enum.max()
+      8
   """
   @moduledoc since: "0.2.2"
 
