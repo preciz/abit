@@ -237,7 +237,7 @@ defmodule Abit.Counter do
   end
 
   @doc """
-  Returns `true` if a counter has the value `integer`,
+  Returns `true` if any counter has the value `integer`,
   `false` otherwise.
 
   ## Examples
