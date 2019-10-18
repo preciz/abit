@@ -11,25 +11,36 @@ defmodule Abit.Counter do
       16   | 0..65535             | -32768..32767
       32   | 0..4294967295        | -2147483648..2147483647
 
-  If you need 64 bit counters use:
+  If you need 64 bit counters use
   [Erlang counters](http://erlang.org/doc/man/counters.html)
 
   The option `:wrap_around` is set to `false` by default. With these
   small-ish counters this is a safe default.
-  When `:wrap_around` is `false` when using `put/3` or `add/3` the error tuple
-  `{:error, :value_out_of_bounds}` will be returned instead of wrap around and
-  the stored counter value will not change.
+  When `:wrap_around` is `false` using `put/3` or `add/3` when the value
+  would be out of bounds the error tuple `{:error, :value_out_of_bounds}`
+  will be returned and the stored counter value will not change.
 
   While Erlang `:atomics` are 1 indexed, `Abit.Counter` counters are 0 indexed.
 
   ## Enumerable protocol
-  #
+
   `Abit.Counter` implements the Enumerable protocol, so all Enum functions can be used:
 
       iex> c = Abit.Counter.new(1000, 16, signed: false)
       iex> c |> Abit.Counter.put(700, 54321)
       iex> c |> Enum.max()
       54321
+
+  ## Examples
+
+     iex> c = Abit.Counter.new(1000, 8, signed: false)
+     iex> c |> Abit.Counter.put(0, 100)
+     {:ok, {0, 100}}
+     iex> c |> Abit.Counter.add(0, 100)
+     {:ok, {0, 200}}
+     iex> c |> Abit.Counter.add(0, 100)
+     {:error, :value_out_of_bounds}
+
   """
 
   @bit_sizes [2, 4, 8, 16, 32]
