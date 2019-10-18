@@ -13,6 +13,38 @@ defmodule Abit do
   The `Abit.Matrix` module has functions to use `:atomics` as an M x N matrix.
 
   The `Abit.Bitmask` functions help working with bitmasks.
+
+  ## Abit
+
+      iex> ref = :atomics.new(100, signed: false)
+      iex> Abit.bit_count(ref)
+      6400
+      iex> Abit.bit_at(ref, 0)
+      0
+      iex> Abit.set_bit_at(ref, 0, 1)
+      :ok
+      iex> Abit.bit_at(ref, 0)
+      1
+
+  ## Abit.Counter
+
+     iex> counter = %Abit.Counter{} = Abit.Counter.new(100, 16)
+     iex> Abit.Counter.get(counter, 0)
+     0
+     iex> Abit.Counter.put(counter, 0, 100)
+     {:ok, {0, 100}}
+     iex> Abit.Counter.add(counter, 0, 100)
+     {:ok, {0, 200}}
+     iex> Abit.Counter.member?(counter, 200)
+     true
+
+  ## Abit.Bitmask
+      iex> Abit.Bitmask.set_bits_count(3)
+      2
+      iex> Abit.Bitmask.bit_at(2, 0)
+      0
+      iex> Abit.Bitmask.bit_at(2, 1)
+      1
   """
 
   import Bitwise
