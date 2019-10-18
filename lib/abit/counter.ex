@@ -21,6 +21,15 @@ defmodule Abit.Counter do
   the stored counter value will not change.
 
   While Erlang `:atomics` are 1 indexed, `Abit.Counter` counters are 0 indexed.
+
+  ## Enumerable protocol
+  #
+  `Abit.Counter` implements the Enumerable protocol, so all Enum functions can be used:
+
+      iex> c = Abit.Counter.new(1000, 16, signed: false)
+      iex> c |> Abit.Counter.put(700, 54321)
+      iex> c |> Enum.max()
+      54321
   """
 
   @bit_sizes [2, 4, 8, 16, 32]
