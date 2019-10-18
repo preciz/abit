@@ -65,9 +65,8 @@ defmodule Abit.Counter do
   @doc """
   Returns a new `%Abit.Counter{}` struct.
 
-    * `size` - minimum number of counters to have
-      (if they don't fill exactly a multiple 64 bit integers, there will be more to fill the `:atomics`,
-      check the `:size` key in the returned `%Abit.Counter{}` struct for the exact number of counters.)
+    * `size` - minimum number of counters to have, counters will fully fill the `:atomics`.
+      Check the `:size` key in the returned `%Abit.Counter{}` for the exact number of counters
     * `counters_bit_size` - how many bits a counter should use
 
   ## Options
