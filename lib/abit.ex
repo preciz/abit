@@ -28,15 +28,15 @@ defmodule Abit do
 
   ## Abit.Counter
 
-     iex> counter = %Abit.Counter{} = Abit.Counter.new(100, 16)
-     iex> Abit.Counter.get(counter, 0)
-     0
-     iex> Abit.Counter.put(counter, 0, 100)
-     {:ok, {0, 100}}
-     iex> Abit.Counter.add(counter, 0, 100)
-     {:ok, {0, 200}}
-     iex> Abit.Counter.member?(counter, 200)
-     true
+      iex> counter = %Abit.Counter{} = Abit.Counter.new(100, 16)
+      iex> Abit.Counter.get(counter, 0)
+      0
+      iex> Abit.Counter.put(counter, 0, 100)
+      {:ok, {0, 100}}
+      iex> Abit.Counter.add(counter, 0, 100)
+      {:ok, {0, 200}}
+      iex> Abit.Counter.member?(counter, 200)
+      true
 
   ## Abit.Bitmask
       iex> Abit.Bitmask.set_bits_count(3)
