@@ -33,13 +33,13 @@ defmodule Abit.Counter do
 
   ## Examples
 
-     iex> c = Abit.Counter.new(1000, 8, signed: false)
-     iex> c |> Abit.Counter.put(0, 100)
-     {:ok, {0, 100}}
-     iex> c |> Abit.Counter.add(0, 100)
-     {:ok, {0, 200}}
-     iex> c |> Abit.Counter.add(0, 100)
-     {:error, :value_out_of_bounds}
+      iex> c = Abit.Counter.new(1000, 8, signed: false)
+      iex> c |> Abit.Counter.put(0, 100)
+      {:ok, {0, 100}}
+      iex> c |> Abit.Counter.add(0, 100)
+      {:ok, {0, 200}}
+      iex> c |> Abit.Counter.add(0, 100)
+      {:error, :value_out_of_bounds}
 
   """
 
