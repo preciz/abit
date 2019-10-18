@@ -64,8 +64,6 @@ defmodule Abit.Counter do
   @spec new(non_neg_integer, 2 | 4 | 8 | 16 | 32, list) :: t
   def new(size, counters_bit_size, options \\ [])
       when is_integer(size) and is_integer(counters_bit_size) do
-    import Bitwise
-
     if counters_bit_size not in @bit_sizes do
       raise ArgumentError,
             "You can't create an %Abit.Counter{} with counters_bit_size #{counters_bit_size}." <>
@@ -79,11 +77,7 @@ defmodule Abit.Counter do
 
     atomics_ref = :atomics.new(atomics_size, signed: false)
 
-    {min, max} =
-      case signed do
-        false -> {0, (1 <<< counters_bit_size) - 1}
-        true -> {-(1 <<< (counters_bit_size - 1)), (1 <<< (counters_bit_size - 1)) - 1}
-      end
+    {min, max} = counter_range(signed, counters_bit_size)
 
     %Counter{
       atomics_ref: atomics_ref,
@@ -222,6 +216,137 @@ defmodule Abit.Counter do
     end
   end
 
+  @doc """
+  Returns `true` if a counter has the value `integer`,
+  `false` otherwise.
+
+  ## Examples
+
+      iex> c = Abit.Counter.new(100, 8)
+      iex> c |> Abit.Counter.member?(0)
+      true
+      iex> c |> Abit.Counter.member?(80)
+      false
+
+  """
+  @doc since: "0.2.4"
+  @spec member?(t, integer) :: boolean
+  def member?(
+        %Counter{
+          atomics_ref: atomics_ref,
+          min: min,
+          max: max
+        } = counter,
+        int
+      )
+      when is_integer(int) do
+    case int do
+      i when i < min ->
+        false
+
+      i when i > max ->
+        false
+
+      _else ->
+        do_member?(counter, int, 1, :atomics.info(atomics_ref).size)
+    end
+  end
+
+  defp do_member?(counter, int, index, index) do
+    int in get_all_at_atomic(counter, index)
+  end
+
+  defp do_member?(counter, int, index, atomics_size) do
+    case int in get_all_at_atomic(counter, index) do
+      true -> true
+      false -> do_member?(counter, int, index + 1, atomics_size)
+    end
+  end
+
+  @doc """
+  Returns all counters from atomics at index.
+
+  Index of atomics are one-based.
+
+  ## Examples
+
+      iex> c = Abit.Counter.new(100, 8)
+      iex> c |> Abit.Counter.put(3, -70)
+      iex> c |> Abit.Counter.get_all_at_atomic(1)
+      [0, 0, 0, 0, -70, 0, 0, 0]
+
+  """
+  @doc since: "0.2.4"
+  @spec get_all_at_atomic(t, pos_integer) :: list(integer)
+  def get_all_at_atomic(
+        %Counter{atomics_ref: atomics_ref, signed: signed, counters_bit_size: bit_size},
+        atomic_index
+      )
+      when is_integer(atomic_index) do
+    atomic = :atomics.get(atomics_ref, atomic_index)
+
+    integer_to_counters(atomic, signed, bit_size)
+  end
+
+  defimpl Enumerable do
+    @moduledoc false
+    @moduledoc since: "0.2.4"
+
+    alias Abit.Counter
+
+    def count(%Counter{size: size}) do
+      {:ok, size}
+    end
+
+    def member?(%Counter{} = counter, int) when is_integer(int) do
+      {:ok, Counter.member?(counter, int)}
+    end
+
+    def slice(%Counter{size: size} = counter) do
+      {
+        :ok,
+        size,
+        fn start, length ->
+          do_slice(counter, start, length)
+        end
+      }
+    end
+
+    defp do_slice(_, _, 0), do: []
+
+    defp do_slice(counter, index, length) do
+      [counter |> Counter.get(index) | do_slice(counter, index + 1, length - 1)]
+    end
+
+    def reduce(%Counter{atomics_ref: atomics_ref} = counter, acc, fun) do
+      size = :atomics.info(atomics_ref).size
+
+      do_reduce({counter, [], 0, size}, acc, fun)
+    end
+
+    def do_reduce(_, {:halt, acc}, _fun), do: {:halted, acc}
+    def do_reduce(tuple, {:suspend, acc}, fun), do: {:suspended, acc, &do_reduce(tuple, &1, fun)}
+    def do_reduce({_, [], size, size}, {:cont, acc}, _fun), do: {:done, acc}
+
+    def do_reduce({counter, [h | tl], index, size}, {:cont, acc}, fun) do
+      do_reduce(
+        {counter, tl, index, size},
+        fun.(h, acc),
+        fun
+      )
+    end
+
+    def do_reduce({counter, [], index, size}, {:cont, acc}, fun) do
+      [h | tl] = Counter.get_all_at_atomic(counter, index + 1)
+
+      do_reduce(
+        {counter, tl, index + 1, size},
+        fun.(h, acc),
+        fun
+      )
+    end
+  end
+
   @bit_sizes
   |> Enum.each(fn counters_bit_size ->
     0..63
@@ -287,4 +412,38 @@ defmodule Abit.Counter do
       end
     end)
   end)
+
+  defp integer_to_counters(integer, signed, bit_size) do
+    do_integer_to_counters(<<integer::64>>, signed, bit_size)
+  end
+
+  for bit_size <- @bit_sizes do
+    defp do_integer_to_counters(
+           <<int::unquote(bit_size), rest::bitstring>>,
+           false,
+           unquote(bit_size)
+         ) do
+      [int | do_integer_to_counters(rest, false, unquote(bit_size))]
+    end
+
+    defp do_integer_to_counters(
+           <<int::unquote(bit_size)-signed, rest::bitstring>>,
+           true,
+           unquote(bit_size)
+         ) do
+      [int | do_integer_to_counters(rest, true, unquote(bit_size))]
+    end
+
+    defp do_integer_to_counters(<<>>, _, _), do: []
+  end
+
+  # Returns {min, max} range of counters for given signed & bit_size
+  defp counter_range(signed, bit_size) do
+    import Bitwise
+
+    case signed do
+      false -> {0, (1 <<< bit_size) - 1}
+      true -> {-(1 <<< (bit_size - 1)), (1 <<< (bit_size - 1)) - 1}
+    end
+  end
 end
