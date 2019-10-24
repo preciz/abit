@@ -11,7 +11,7 @@ Add `abit` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:abit, "~> 0.2"}
+    {:abit, "~> 0.3"}
   ]
 end
 ```

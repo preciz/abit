@@ -1,7 +1,7 @@
 # Changelog for Abit
 
 ## v0.3.0
-  * BREAKING - removed `Abit.Matrix` module. Most functionality extracted to [matrax](https://hex.pm/packages/matrax).
+  * BREAKING - removed `Abit.Matrix` module. Extracted to [matrax](https://hex.pm/packages/matrax).
 
 ## v0.2.4
   * Feature - `Abit.Counter` implements `Enumerable` protocol
