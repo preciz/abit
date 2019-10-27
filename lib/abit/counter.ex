@@ -92,7 +92,7 @@ defmodule Abit.Counter do
     signed = options |> Keyword.get(:signed, true)
     wrap_around = options |> Keyword.get(:wrap_around, false)
 
-    atomics_size = ceil(size / (64 / counters_bit_size))
+    atomics_size = Float.ceil(size / (64 / counters_bit_size)) |> round()
 
     atomics_ref = :atomics.new(atomics_size, signed: false)
 
