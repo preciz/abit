@@ -38,3 +38,8 @@ See [https://hexdocs.pm/abit](https://hexdocs.pm/abit) for full documentation.
 * `Abit.Bitmask.bit_at/2` - Returns the bit at a given position in the given integer.
 * `Abit.Bitmask.set_bit_at/3` - Sets a bit in the given integer at the given position to a given bit (0 or 1).
 * `Abit.hamming_distance/2` - Returns the bitwise hamming distance between the 2 given integers.
+
+
+## License
+
+Abit is [MIT licensed](LICENSE).
