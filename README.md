@@ -1,10 +1,14 @@
 # Abit
 
+[![Build Status](https://travis-ci.org/preciz/abit.svg?branch=master)](https://travis-ci.org/preciz/abit)
+
 Use `:atomics` as a bit array or as an array of N-bit counters.
 
 Documentation can be found at [https://hexdocs.pm/abit](https://hexdocs.pm/abit).
 
 ## Installation
+
+**Note**: it requires OTP-21.2.1 or later.
 
 Add `abit` to your list of dependencies in `mix.exs`:
 
