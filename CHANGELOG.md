@@ -1,5 +1,8 @@
 # Changelog for Abit
 
+## v0.3.1
+  * Fix - work with elixir 1.7 by not using Kernel.floor/1 & Kernel.ceil/1
+
 ## v0.3.0
   * BREAKING - removed `Abit.Matrix` module. Extracted to [matrax](https://hex.pm/packages/matrax).
 
