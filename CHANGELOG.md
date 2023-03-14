@@ -1,5 +1,8 @@
 # Changelog for Abit
 
+## v0.3.2
+  * Fix - compile warning about using `^^^/2` in `Abit.Counter`
+
 ## v0.3.1
   * Fix - work with elixir 1.7 by not using Kernel.floor/1 & Kernel.ceil/1
 
