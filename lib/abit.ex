@@ -295,7 +295,7 @@ defmodule Abit do
   def to_list(ref) when is_reference(ref) do
     size = :atomics.info(ref).size
 
-    (1..size)
+    1..size
     |> Enum.flat_map(fn index ->
       :atomics.get(ref, index) |> Abit.Bitmask.to_list(64)
     end)

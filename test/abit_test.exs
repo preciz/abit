@@ -9,7 +9,7 @@ defmodule AbitTest do
     |> Enum.each(fn index ->
       0..63
       |> Enum.each(fn pos ->
-        bit = (index * 64) + pos
+        bit = index * 64 + pos
 
         ref |> Abit.set_bit_at(bit, 1)
 

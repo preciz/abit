@@ -28,7 +28,7 @@ defmodule Abit.MixProject do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
 
@@ -36,7 +36,7 @@ defmodule Abit.MixProject do
     [
       main: "Abit",
       source_ref: "v#{@version}",
-      source_url: @github,
+      source_url: @github
     ]
   end
 
