@@ -92,7 +92,7 @@ defmodule Abit.Bitmask do
   """
   @spec hamming_distance(integer, integer) :: non_neg_integer
   def hamming_distance(int_l, int_r) when is_integer(int_l) and is_integer(int_r) do
-    (int_l ^^^ int_r) |> set_bits_count
+    bxor(int_l, int_r) |> set_bits_count()
   end
 
   @doc """
