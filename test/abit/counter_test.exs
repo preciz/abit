@@ -56,7 +56,7 @@ defmodule Abit.CounterTest do
       assert n = counter |> Counter.get(n)
 
       expected = n + n
-      assert {:ok, {n, ^expected}} = counter |> Counter.add(n, n)
+      assert {:ok, {^n, ^expected}} = counter |> Counter.add(n, n)
     end)
   end
 
