@@ -124,20 +124,50 @@ defmodule AbitTest do
     assert result == List.duplicate(0, 53) ++ [1] ++ List.duplicate(0, 10)
   end
 
+  describe "bit_count/1" do
+    test "returns correct bit count for atomics with arity 1" do
+      ref = :atomics.new(1, signed: false)
+      assert Abit.bit_count(ref) == 64
+    end
+
+    test "returns correct bit count for atomics with arity 3" do
+      ref = :atomics.new(3, signed: false)
+      assert Abit.bit_count(ref) == 192
+    end
+  end
+
+  describe "bit_position/1" do
+    test "returns correct position for first bit" do
+      assert Abit.bit_position(0) == {1, 0}
+    end
+
+    test "returns correct position for bit within first atomic" do
+      assert Abit.bit_position(63) == {1, 63}
+    end
+
+    test "returns correct position for first bit of second atomic" do
+      assert Abit.bit_position(64) == {2, 0}
+    end
+
+    test "returns correct position for large bit index" do
+      assert Abit.bit_position(1000) == {16, 40}
+    end
+  end
+
   describe "set_bits_count/1" do
     test "returns 0 for an empty atomics reference" do
       ref = :atomics.new(1, signed: false)
       assert Abit.set_bits_count(ref) == 0
     end
 
-    test "returns correct count for a single atomic with multiple bits set" do
+    test "returns correct count for atomics with arity 1 and all bits set" do
       ref = :atomics.new(1, signed: false)
       # Binary: 111
       :atomics.put(ref, 1, 7)
       assert Abit.set_bits_count(ref) == 3
     end
 
-    test "returns correct count for multiple atomics with bits set" do
+    test "returns correct count for atomics with arity 1 and no bits set" do
       ref = :atomics.new(3, signed: false)
       # Binary: 101
       :atomics.put(ref, 1, 5)
