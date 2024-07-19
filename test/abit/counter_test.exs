@@ -1,5 +1,5 @@
 defmodule Abit.CounterTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   doctest Abit.Counter
 

@@ -246,7 +246,6 @@ defmodule Abit.Counter do
       true
       iex> c |> Abit.Counter.member?(80)
       false
-
   """
   @doc since: "0.2.4"
   @spec member?(t, integer) :: boolean
