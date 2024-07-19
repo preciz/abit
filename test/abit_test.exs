@@ -123,4 +123,38 @@ defmodule AbitTest do
 
     assert result == List.duplicate(0, 53) ++ [1] ++ List.duplicate(0, 10)
   end
+
+  describe "set_bits_count/1" do
+    test "returns 0 for an empty atomics reference" do
+      ref = :atomics.new(1, signed: false)
+      assert Abit.set_bits_count(ref) == 0
+    end
+
+    test "returns correct count for a single atomic with multiple bits set" do
+      ref = :atomics.new(1, signed: false)
+      # Binary: 111
+      :atomics.put(ref, 1, 7)
+      assert Abit.set_bits_count(ref) == 3
+    end
+
+    test "returns correct count for multiple atomics with bits set" do
+      ref = :atomics.new(3, signed: false)
+      # Binary: 101
+      :atomics.put(ref, 1, 5)
+      # Binary: 11
+      :atomics.put(ref, 2, 3)
+      # Binary: 1000
+      :atomics.put(ref, 3, 8)
+      assert Abit.set_bits_count(ref) == 5
+    end
+
+    test "handles large numbers correctly" do
+      ref = :atomics.new(2, signed: false)
+      # All 64 bits set
+      :atomics.put(ref, 1, 0xFFFFFFFFFFFFFFFF)
+      # Lower 32 bits set
+      :atomics.put(ref, 2, 0x00000000FFFFFFFF)
+      assert Abit.set_bits_count(ref) == 96
+    end
+  end
 end
