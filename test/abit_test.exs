@@ -1,5 +1,5 @@
 defmodule AbitTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Abit
 
   test "set_bit_at" do
@@ -98,5 +98,29 @@ defmodule AbitTest do
 
       Abit.hamming_distance(ref_l, ref_r)
     end
+  end
+
+  test "to_list returns a flat list of bits" do
+    ref = :atomics.new(2, signed: false)
+    # 5 in binary is 101
+    :atomics.put(ref, 1, 5)
+    # 3 in binary is 11
+    :atomics.put(ref, 2, 3)
+
+    result = Abit.to_list(ref)
+
+    expected_first = List.duplicate(0, 61) ++ [1, 0, 1]
+    expected_second = List.duplicate(0, 62) ++ [1, 1]
+
+    assert result == expected_first ++ expected_second
+  end
+
+  test "to_list correctly returns bits for the value 1024" do
+    ref = :atomics.new(1, signed: false)
+    :atomics.put(ref, 1, 1024)
+
+    result = Abit.to_list(ref)
+
+    assert result == List.duplicate(0, 53) ++ [1] ++ List.duplicate(0, 10)
   end
 end
