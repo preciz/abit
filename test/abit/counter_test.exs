@@ -90,4 +90,54 @@ defmodule Abit.CounterTest do
     counter2 |> Counter.put(0, 15)
     assert {:ok, {0, 0}} = counter2 |> Counter.add(0, 1)
   end
+
+  test "new/3 creates counters with correct size" do
+    counter = Counter.new(100, 8)
+    assert counter.size >= 100
+    assert rem(counter.size, 8) == 0
+  end
+
+  test "new/3 raises error for invalid bit sizes" do
+    assert_raise ArgumentError, fn ->
+      Counter.new(10, 3)
+    end
+  end
+
+  test "get/2 returns 0 for uninitialized counters" do
+    counter = Counter.new(10, 8)
+    assert 0 = Counter.get(counter, 5)
+  end
+
+  test "put/3 returns error for out-of-bounds values when wrap_around is false" do
+    counter = Counter.new(10, 8)
+    assert {:error, :value_out_of_bounds} = Counter.put(counter, 0, 256)
+    assert {:error, :value_out_of_bounds} = Counter.put(counter, 0, -129)
+  end
+
+  test "add/3 wraps around correctly for signed counters" do
+    counter = Counter.new(10, 8, wrap_around: true)
+    Counter.put(counter, 0, 127)
+    assert {:ok, {0, -128}} = Counter.add(counter, 0, 1)
+    assert {:ok, {0, 127}} = Counter.add(counter, 0, 255)
+  end
+
+  test "member?/2 works correctly" do
+    counter = Counter.new(100, 8)
+    Counter.put(counter, 50, 42)
+    assert Counter.member?(counter, 42)
+    refute Counter.member?(counter, 43)
+  end
+
+  test "Enumerable protocol implementation" do
+    counter = Counter.new(100, 8)
+    Counter.put(counter, 50, 42)
+    Counter.put(counter, 75, 100)
+
+    assert Enum.count(counter) == 104
+    assert Enum.member?(counter, 42)
+    assert Enum.member?(counter, 100)
+    refute Enum.member?(counter, 101)
+
+    assert Enum.max(counter) == 100
+  end
 end
