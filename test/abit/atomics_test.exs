@@ -1,5 +1,6 @@
 defmodule Abit.AtomicsTest do
   use ExUnit.Case, async: true
+  doctest Abit.Atomics
   alias Abit.Atomics
 
   describe "to_list/1" do
