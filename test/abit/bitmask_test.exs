@@ -56,10 +56,14 @@ defmodule Abit.BitmaskTest do
     assert 2 == Bitmask.hamming_distance(1, 8)
 
     # Additional test cases
-    assert 3 == Bitmask.hamming_distance(7, 0)  # 111 vs 000
-    assert 4 == Bitmask.hamming_distance(15, 0)  # 1111 vs 0000
-    assert 1 == Bitmask.hamming_distance(3, 1)  # 11 vs 01
-    assert 32 == Bitmask.hamming_distance(0xFFFFFFFF, 0)  # All bits different
+    # 111 vs 000
+    assert 3 == Bitmask.hamming_distance(7, 0)
+    # 1111 vs 0000
+    assert 4 == Bitmask.hamming_distance(15, 0)
+    # 11 vs 01
+    assert 1 == Bitmask.hamming_distance(3, 1)
+    # All bits different
+    assert 32 == Bitmask.hamming_distance(0xFFFFFFFF, 0)
   end
 
   test "to_list" do
