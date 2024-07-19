@@ -76,7 +76,7 @@ defmodule Abit.Bitmask do
   end
 
   @doc """
-  Returns the bitwise hamming distance between the
+  Returns the bitwise Hamming distance between the
   given integers `int_l` and `int_r`.
 
   ## Examples

@@ -231,10 +231,10 @@ defmodule Abit do
   end
 
   @doc """
-  Returns the bitwise hamming distance between the two
+  Returns the bitwise Hamming distance between the two
   given `:atomics` references `ref_l` and `ref_r`.
 
-  Raises ArgumentError if the size of `ref_l` and `ref_r` don't equal.
+  Raises ArgumentError if the sizes of `ref_l` and `ref_r` are not equal.
 
   ## Examples
 
@@ -253,7 +253,7 @@ defmodule Abit do
 
     if ref_l_size != ref_r_size do
       raise ArgumentError,
-            "The sizes of the provided `:atomics` references don't match" <>
+            "The sizes of the provided `:atomics` references don't match. " <>
               "Size of `ref_l` is #{ref_l_size}. Size of `ref_r` is #{ref_r_size}."
     end
 
