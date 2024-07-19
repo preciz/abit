@@ -1,5 +1,10 @@
 defmodule Abit.Atomics do
-  @moduledoc false
+  @moduledoc """
+  Internal module for working with Erlang's :atomics.
+
+  This module provides utility functions for working with Erlang's :atomics.
+  It should not be used directly by users of the Abit library.
+  """
 
   def to_list(atomics_ref) when is_reference(atomics_ref) do
     do_to_list(atomics_ref, 1, :atomics.info(atomics_ref).size)
