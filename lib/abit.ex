@@ -10,7 +10,7 @@ defmodule Abit do
   The `Abit.Counter` module has functions to use `:atomics` as an array of N-bit
   counters.
 
-  The `Abit.Bitmask` functions help working with bitmasks.
+  The functions in `Abit.Bitmask` help working with bitmasks.
 
   ## Abit
 
