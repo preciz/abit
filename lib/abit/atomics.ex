@@ -30,6 +30,7 @@ defmodule Abit.Atomics do
       [10, 20, 30]
 
   """
+  @spec to_list(reference()) :: list(integer())
   def to_list(atomics_ref) when is_reference(atomics_ref) do
     do_to_list(atomics_ref, 1, :atomics.info(atomics_ref).size)
   end
@@ -69,6 +70,7 @@ defmodule Abit.Atomics do
       false
 
   """
+  @spec member?(reference(), integer()) :: boolean()
   def member?(atomics_ref, int) when is_reference(atomics_ref) and is_integer(int) do
     %{min: min, max: max, size: size} = :atomics.info(atomics_ref)
 

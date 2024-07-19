@@ -80,7 +80,7 @@ defmodule Abit.Counter do
       Abit.Counter.new(10_000, 16, signed: false) # minimum 10_000 counters; 16 bits unsigned
       Abit.Counter.new(10_000, 16, wrap_around: false) # don't wrap around
   """
-  @spec new(non_neg_integer, 2 | 4 | 8 | 16 | 32, list) :: t
+  @spec new(non_neg_integer(), 2 | 4 | 8 | 16 | 32, keyword()) :: t()
   def new(size, counters_bit_size, options \\ [])
       when is_integer(size) and is_integer(counters_bit_size) do
     if counters_bit_size not in @bit_sizes do
