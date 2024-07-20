@@ -1,6 +1,6 @@
 # Abit
 
-[![Build Status](https://travis-ci.org/preciz/abit.svg?branch=master)](https://travis-ci.org/preciz/abit)
+[![test](https://github.com/preciz/abit/actions/workflows/test.yml/badge.svg)](https://github.com/preciz/abit/actions/workflows/test.yml)
 
 Use `:atomics` as a bit array or as an array of N-bit counters.
 
