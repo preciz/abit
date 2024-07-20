@@ -119,6 +119,7 @@ defmodule Abit.Atomics do
       <<0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2>>
 
   """
+  @doc since: "0.3.3"
   @spec serialize(reference()) :: binary()
   def serialize(atomics_ref) when is_reference(atomics_ref) do
     %{size: size} = :atomics.info(atomics_ref)
@@ -165,6 +166,7 @@ defmodule Abit.Atomics do
       [10, -20]
 
   """
+  @doc since: "0.3.3"
   @spec deserialize(binary()) :: reference()
   def deserialize(<<signature_byte::8, rest::binary>>) do
     signed? =
