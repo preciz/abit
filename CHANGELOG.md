@@ -1,5 +1,8 @@
 # Changelog for Abit
 
+## v0.3.3
+  * Feauter - `Abit.Atomics` implements `serialize/1` and `deserialize/1` functions.
+
 ## v0.3.2
   * Fix - compile warning about using `^^^/2` in `Abit.Counter`
 
