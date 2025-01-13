@@ -1,6 +1,6 @@
 defmodule Abit do
   @moduledoc """
-  Abit let's you use `:atomics` as a bit array or as an array of N-bit counters.
+  Abit lets you use `:atomics` as a bit array or as an array of N-bit counters.
 
   To know more about `:atomics` check the [Erlang atomics documentation](http://erlang.org/doc/man/atomics.html)
 

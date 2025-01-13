@@ -15,7 +15,7 @@ defmodule Abit.Counter do
   [Erlang counters](http://erlang.org/doc/man/counters.html)
 
   The option `:wrap_around` is set to `false` by default. With these
-  small-ish counters this is a safe default.
+  smallish counters this is a safe default.
   When `:wrap_around` is `false` using `put/3` or `add/3` when the value
   would be out of bounds the error tuple `{:error, :value_out_of_bounds}`
   will be returned and the stored counter value will not change.
