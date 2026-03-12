@@ -132,9 +132,9 @@ defmodule Abit.CounterTest do
 
   test "add/3 concurrently to the same counter to trigger retry" do
     counter = Counter.new(10, 32)
-    tasks = for _ <- 1..50, do: Task.async(fn -> Counter.add(counter, 1, 1) end)
+    tasks = for _ <- 1..500, do: Task.async(fn -> Counter.add(counter, 1, 1) end)
     Enum.each(tasks, &Task.await/1)
-    assert Counter.get(counter, 1) == 50
+    assert Counter.get(counter, 1) == 500
   end
 
   test "add/3 concurrently for different bits in the same atomics integer" do

@@ -241,20 +241,29 @@ defmodule AbitTest do
 
   test "set_bit_at/3 concurrently for different bits" do
     ref = :atomics.new(1, signed: false)
+    
+    # Spawn tasks that toggle bit 0 concurrently to create contention on the atomics integer
+    toggle_tasks = for _ <- 1..500, do: Task.async(fn -> Abit.toggle_bit_at(ref, 63) end)
+    
     tasks = for i <- 0..50, do: Task.async(fn -> Abit.set_bit_at(ref, i, 1) end)
-    Enum.each(tasks, &Task.await/1)
-    assert Abit.set_bits_count(ref) == 51
+    
+    Enum.each(toggle_tasks ++ tasks, &Task.await/1)
+    
+    # All bits 0..50 should be set
+    for i <- 0..50 do
+      assert Abit.bit_at(ref, i) == 1
+    end
   end
 
   test "toggle_bit_at/2 concurrently for the same bit" do
     ref = :atomics.new(1, signed: false)
-    # Toggling 50 times should result in the bit being set to 0.
-    tasks = for _ <- 1..50, do: Task.async(fn -> Abit.toggle_bit_at(ref, 0) end)
+    # Toggling 500 times should result in the bit being set to 0.
+    tasks = for _ <- 1..500, do: Task.async(fn -> Abit.toggle_bit_at(ref, 0) end)
     Enum.each(tasks, &Task.await/1)
     assert :atomics.get(ref, 1) == 0
     
-    # Toggling 51 times should result in the bit being set to 1.
-    tasks = for _ <- 1..51, do: Task.async(fn -> Abit.toggle_bit_at(ref, 0) end)
+    # Toggling 501 times should result in the bit being set to 1.
+    tasks = for _ <- 1..501, do: Task.async(fn -> Abit.toggle_bit_at(ref, 0) end)
     Enum.each(tasks, &Task.await/1)
     assert :atomics.get(ref, 1) == 1
   end
