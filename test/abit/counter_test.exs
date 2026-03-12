@@ -169,4 +169,27 @@ defmodule Abit.CounterTest do
     # This covers `do_reduce` with `{:suspend, acc}`
     assert Enum.zip(counter, [1, 2, 3]) |> Enum.to_list() == [{0, 1}, {42, 2}, {0, 3}]
   end
+
+  describe "quirky edge cases" do
+    test "new with size 0 throws ArgumentError from Erlang :atomics" do
+      # Since size calculation rounds down to 0 for size=0, :atomics.new fails.
+      assert_raise ArgumentError, fn ->
+        Counter.new(0, 8)
+      end
+    end
+    
+    test "put with negative value when wrap_around is true" do
+      c = Counter.new(10, 8, wrap_around: true, signed: false)
+      # -1 wrapping around in 8-bit unsigned becomes 255
+      assert {:ok, {0, 255}} = Counter.put(c, 0, -1)
+      assert Counter.get(c, 0) == 255
+    end
+    
+    test "add with very large increment wrapping around multiple times" do
+      c = Counter.new(10, 8, wrap_around: true, signed: false)
+      # 256 + 10 = 266 -> wraps around 256 to 10
+      assert {:ok, {0, 10}} = Counter.add(c, 0, 266)
+      assert Counter.get(c, 0) == 10
+    end
+  end
 end

@@ -1,5 +1,6 @@
 defmodule Abit.BitmaskTest do
   use ExUnit.Case, async: true
+  import Bitwise
 
   doctest Abit.Bitmask
 
@@ -72,5 +73,29 @@ defmodule Abit.BitmaskTest do
     assert [1, 1, 0] == Bitmask.to_list(6, 3)
     assert [1, 0, 1, 0] == Bitmask.to_list(10, 4)
     assert [1, 0, 0, 0, 0] == Bitmask.to_list(16, 5)
+  end
+
+  describe "quirky edge cases" do
+    test "set_bits_count with integer larger than 64 bits and negative integers" do
+      # 1 shifted by 64 bits should logically have 1 bit set.
+      # But due to the 64-bit masking implementation, it currently returns 0.
+      assert Bitmask.set_bits_count(1 <<< 64) == 0
+
+      # -1 in 2's complement is represented with all 1s (virtually infinite),
+      # but set_bits_count is bounded by 64 bits so it returns 64.
+      assert Bitmask.set_bits_count(-1) == 64
+    end
+
+    test "bit_at and set_bit_at with negative bit_index fail silently" do
+      # Negative shifts yield 0, leading to silent no-ops rather than crashes.
+      assert Bitmask.bit_at(10, -1) == 0
+      assert Bitmask.set_bit_at(10, -1, 1) == 10
+      assert Bitmask.set_bit_at(10, -1, 0) == 10
+    end
+    
+    test "hamming_distance with integers larger than 64 bits" do
+      # Since it uses set_bits_count, it also ignores bits above 64.
+      assert Bitmask.hamming_distance(1 <<< 65, 0) == 0
+    end
   end
 end
