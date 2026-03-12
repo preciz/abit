@@ -25,7 +25,7 @@ See [https://hexdocs.pm/abit](https://hexdocs.pm/abit) for full documentation.
 
 ### Abit - use `:atomics` as a bit array
 * `Abit.bit_count/1` - Returns count of bits in atomics.
-* `Abit.merge/2` - Merges bits of 2 atomics using Bitwise OR.
+* `Abit.union/2` - Unions bits of 2 atomics using Bitwise OR.
 * `Abit.intersect/2` - Intersects bits of 2 atomics using Bitwise AND.
 * `Abit.bit_position/1` - Returns the bit's position in an atomics array.
 * `Abit.bit_at/2` - Returns the bit at a given position from atomics.

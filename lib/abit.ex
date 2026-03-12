@@ -68,27 +68,34 @@ defmodule Abit do
   end
 
   @doc """
-  Merge bits of atomics `ref_a` & `ref_b` using the
+  Union bits of atomics `ref_a` & `ref_b` using the
   bitwise OR operator.
 
-  `ref_b` will be merged into `ref_a`.
+  `ref_b` will be unioned into `ref_a`.
   Returns `ref_a` mutated.
   """
-  @spec merge(reference, reference) :: reference
-  def merge(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
+  @spec union(reference, reference) :: reference
+  def union(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     %{size: size} = ref_a |> :atomics.info()
 
-    do_merge(ref_a, ref_b, size)
+    do_union(ref_a, ref_b, size)
   end
 
-  defp do_merge(ref_a, _, 0), do: ref_a
+  @doc false
+  @deprecated "Use union/2 instead"
+  @spec merge(reference, reference) :: reference
+  def merge(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
+    union(ref_a, ref_b)
+  end
 
-  defp do_merge(ref_a, ref_b, index) do
-    merged_value = :atomics.get(ref_a, index) ||| :atomics.get(ref_b, index)
+  defp do_union(ref_a, _, 0), do: ref_a
 
-    :atomics.put(ref_a, index, merged_value)
+  defp do_union(ref_a, ref_b, index) do
+    unioned_value = :atomics.get(ref_a, index) ||| :atomics.get(ref_b, index)
 
-    do_merge(ref_a, ref_b, index - 1)
+    :atomics.put(ref_a, index, unioned_value)
+
+    do_union(ref_a, ref_b, index - 1)
   end
 
   @doc """

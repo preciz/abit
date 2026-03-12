@@ -1,5 +1,8 @@
 # Changelog for Abit
 
+## v0.4.0
+  * Deprecation - `Abit.merge/2` is deprecated in favor of `Abit.union/2` to align with standard set theory terminology.
+
 ## v0.3.3
   * Feauter - `Abit.Atomics` implements `serialize/1` and `deserialize/1` functions.
 

@@ -1,7 +1,7 @@
 defmodule Abit.MixProject do
   use Mix.Project
 
-  @version "0.3.3"
+  @version "0.4.0"
   @github "https://github.com/preciz/abit"
 
   def project do
