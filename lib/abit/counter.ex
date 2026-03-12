@@ -291,7 +291,7 @@ defmodule Abit.Counter do
       iex> c = Abit.Counter.new(100, 8)
       iex> c |> Abit.Counter.put(3, -70)
       iex> c |> Abit.Counter.get_all_at_atomic(1)
-      [0, 0, 0, 0, -70, 0, 0, 0]
+      [0, 0, 0, -70, 0, 0, 0, 0]
 
   """
   @doc since: "0.2.4"
@@ -320,20 +320,20 @@ defmodule Abit.Counter do
       {:ok, Counter.member?(counter, int)}
     end
 
-    def slice(%Counter{size: size} = counter) do
-      {
-        :ok,
-        size,
-        fn start, length ->
-          do_slice(counter, start, length)
-        end
-      }
+    if Version.match?(System.version(), ">= 1.12.0-dev") do
+      def slice(%Counter{size: size} = counter) do
+        {:ok, size, fn start, length, step -> do_slice(counter, start, length, step) end}
+      end
+    else
+      def slice(%Counter{size: size} = counter) do
+        {:ok, size, fn start, length -> do_slice(counter, start, length, 1) end}
+      end
     end
 
-    defp do_slice(_, _, 0), do: []
+    defp do_slice(_, _, 0, _), do: []
 
-    defp do_slice(counter, index, length) do
-      [counter |> Counter.get(index) | do_slice(counter, index + 1, length - 1)]
+    defp do_slice(counter, index, length, step) do
+      [counter |> Counter.get(index) | do_slice(counter, index + step, length - 1, step)]
     end
 
     def reduce(%Counter{atomics_ref: atomics_ref} = counter, acc, fun) do
@@ -432,27 +432,29 @@ defmodule Abit.Counter do
   end)
 
   defp integer_to_counters(integer, signed, bit_size) do
-    do_integer_to_counters(<<integer::64>>, signed, bit_size)
+    do_integer_to_counters(<<integer::64>>, signed, bit_size, [])
   end
 
   for bit_size <- @bit_sizes do
     defp do_integer_to_counters(
            <<int::unquote(bit_size), rest::bitstring>>,
            false,
-           unquote(bit_size)
+           unquote(bit_size),
+           acc
          ) do
-      [int | do_integer_to_counters(rest, false, unquote(bit_size))]
+      do_integer_to_counters(rest, false, unquote(bit_size), [int | acc])
     end
 
     defp do_integer_to_counters(
            <<int::unquote(bit_size)-signed, rest::bitstring>>,
            true,
-           unquote(bit_size)
+           unquote(bit_size),
+           acc
          ) do
-      [int | do_integer_to_counters(rest, true, unquote(bit_size))]
+      do_integer_to_counters(rest, true, unquote(bit_size), [int | acc])
     end
 
-    defp do_integer_to_counters(<<>>, _, _), do: []
+    defp do_integer_to_counters(<<>>, _, _, acc), do: acc
   end
 
   # Returns {min, max} range of counters for given signed & bit_size

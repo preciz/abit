@@ -121,23 +121,52 @@ defmodule Abit.CounterTest do
     assert {:ok, {0, 127}} = Counter.add(counter, 0, 255)
   end
 
-  test "member?/2 works correctly" do
+  test "member?/2 works correctly and out of bounds" do
     counter = Counter.new(100, 8)
     Counter.put(counter, 50, 42)
     assert Counter.member?(counter, 42)
     refute Counter.member?(counter, 43)
+    refute Counter.member?(counter, -129)
+    refute Counter.member?(counter, 256)
+  end
+
+  test "add/3 concurrently to the same counter to trigger retry" do
+    counter = Counter.new(10, 32)
+    tasks = for _ <- 1..50, do: Task.async(fn -> Counter.add(counter, 1, 1) end)
+    Enum.each(tasks, &Task.await/1)
+    assert Counter.get(counter, 1) == 50
+  end
+
+  test "add/3 concurrently for different bits in the same atomics integer" do
+    counter = Counter.new(10, 8)
+    tasks = for i <- 1..8, do: Task.async(fn -> Counter.add(counter, i, 1) end)
+    Enum.each(tasks, &Task.await/1)
+    for i <- 1..8, do: assert Counter.get(counter, i) == 1
   end
 
   test "Enumerable protocol implementation" do
-    counter = Counter.new(100, 8)
-    Counter.put(counter, 50, 42)
-    Counter.put(counter, 75, 100)
+    counter = Counter.new(10, 8)
+    Counter.put(counter, 1, 42)
+    Counter.put(counter, 3, 100)
 
-    assert Enum.count(counter) == 104
+    assert Enum.count(counter) == 16
     assert Enum.member?(counter, 42)
     assert Enum.member?(counter, 100)
     refute Enum.member?(counter, 101)
 
     assert Enum.max(counter) == 100
+    
+    # This covers `do_reduce` with `{:halt, acc}` and `fun` invocation
+    assert Enum.take(counter, 4) == [0, 42, 0, 100]
+    
+    # This covers `do_reduce` reaching the `done` state
+    assert Enum.sum(counter) == 142
+    assert Enum.to_list(counter) |> length() == 16
+
+    # This covers `do_slice` function via `Enum.slice`
+    assert Enum.slice(counter, 1..3) == [42, 0, 100]
+    
+    # This covers `do_reduce` with `{:suspend, acc}`
+    assert Enum.zip(counter, [1, 2, 3]) |> Enum.to_list() == [{0, 1}, {42, 2}, {0, 3}]
   end
 end

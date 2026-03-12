@@ -20,6 +20,19 @@ defmodule AbitTest do
     end)
   end
 
+  test "merge/2 is deprecated but still works" do
+    ref_a = :atomics.new(2, signed: false)
+    ref_b = :atomics.new(2, signed: false)
+
+    ref_a |> :atomics.put(1, 321)
+    ref_b |> :atomics.put(2, 123)
+
+    merged_ref = Abit.merge(ref_a, ref_b)
+    assert merged_ref == ref_a
+    assert 321 = :atomics.get(merged_ref, 1)
+    assert 123 = :atomics.get(merged_ref, 2)
+  end
+
   test "union of 2 atomics bit arrays returns left reference" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
@@ -134,6 +147,13 @@ defmodule AbitTest do
       ref = :atomics.new(3, signed: false)
       assert Abit.bit_count(ref) == 192
     end
+  end
+
+  test "set_bit_at/3 concurrently for different bits" do
+    ref = :atomics.new(1, signed: false)
+    tasks = for i <- 0..50, do: Task.async(fn -> Abit.set_bit_at(ref, i, 1) end)
+    Enum.each(tasks, &Task.await/1)
+    assert Abit.set_bits_count(ref) == 51
   end
 
   describe "bit_position/1" do
