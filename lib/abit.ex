@@ -10,6 +10,8 @@ defmodule Abit do
   The `Abit.Counter` module has functions to use `:atomics` as an array of N-bit
   counters.
 
+  The functions in `Abit.Atomics` help working with Erlang's `:atomics`.
+
   The functions in `Abit.Bitmask` help working with bitmasks.
 
   ## Abit
@@ -35,6 +37,13 @@ defmodule Abit do
       {:ok, {0, 200}}
       iex> Abit.Counter.member?(counter, 200)
       true
+
+  ## Abit.Atomics
+
+      iex> ref = :atomics.new(3, signed: false)
+      iex> :atomics.put(ref, 1, 10)
+      iex> Abit.Atomics.to_list(ref)
+      [10, 0, 0]
 
   ## Abit.Bitmask
       iex> Abit.Bitmask.set_bits_count(3)
