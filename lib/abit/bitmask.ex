@@ -19,15 +19,21 @@ defmodule Abit.Bitmask do
       iex> Abit.Bitmask.set_bits_count(1023)
       10
   """
+  @popcount_table (for i <- 0..255,
+                        do:
+                          for(<<b::1 <- <<i::8>> >>, b == 1, reduce: 0, do: (acc -> acc + 1)))
+                  |> List.to_tuple()
+
   @spec set_bits_count(integer) :: non_neg_integer
   def set_bits_count(int) when is_integer(int) do
-    do_set_bits_count(int, 0)
-  end
-
-  defp do_set_bits_count(0, acc), do: acc
-
-  defp do_set_bits_count(int, acc) do
-    do_set_bits_count(int >>> 1, acc + (int &&& 1))
+    elem(@popcount_table, int &&& 255) +
+      elem(@popcount_table, (int >>> 8) &&& 255) +
+      elem(@popcount_table, (int >>> 16) &&& 255) +
+      elem(@popcount_table, (int >>> 24) &&& 255) +
+      elem(@popcount_table, (int >>> 32) &&& 255) +
+      elem(@popcount_table, (int >>> 40) &&& 255) +
+      elem(@popcount_table, (int >>> 48) &&& 255) +
+      elem(@popcount_table, (int >>> 56) &&& 255)
   end
 
   @doc """
