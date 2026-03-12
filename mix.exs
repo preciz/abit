@@ -29,7 +29,7 @@ defmodule Abit.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.36", only: :dev, runtime: false},
-      {:benchee, "~> 1.3", only: :dev}
+      {:benchee, "~> 1.5", only: :dev}
     ]
   end
 
