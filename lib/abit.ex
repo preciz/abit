@@ -121,6 +121,76 @@ defmodule Abit do
   end
 
   @doc """
+  Bit difference of atomics using Bitwise AND NOT operators.
+
+  Clears the bits in `ref_a` that are set in `ref_b`.
+  Returns `ref_a` mutated.
+  """
+  @doc since: "0.4.0"
+  @spec difference(reference, reference) :: reference
+  def difference(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
+    %{size: size} = ref_a |> :atomics.info()
+
+    do_difference(ref_a, ref_b, size)
+  end
+
+  defp do_difference(ref_a, _, 0), do: ref_a
+
+  defp do_difference(ref_a, ref_b, index) do
+    diff_value = :atomics.get(ref_a, index) &&& bnot(:atomics.get(ref_b, index))
+
+    :atomics.put(ref_a, index, diff_value)
+
+    do_difference(ref_a, ref_b, index - 1)
+  end
+
+  @doc """
+  Bit symmetric difference (XOR) of atomics using Bitwise XOR operator.
+
+  Returns `ref_a` mutated.
+  """
+  @doc since: "0.4.0"
+  @spec symmetric_difference(reference, reference) :: reference
+  def symmetric_difference(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
+    %{size: size} = ref_a |> :atomics.info()
+
+    do_symmetric_difference(ref_a, ref_b, size)
+  end
+
+  defp do_symmetric_difference(ref_a, _, 0), do: ref_a
+
+  defp do_symmetric_difference(ref_a, ref_b, index) do
+    xor_value = :atomics.get(ref_a, index) |> bxor(:atomics.get(ref_b, index))
+
+    :atomics.put(ref_a, index, xor_value)
+
+    do_symmetric_difference(ref_a, ref_b, index - 1)
+  end
+
+  @doc """
+  Inverts all bits in the atomics reference using Bitwise NOT operator.
+
+  Returns `ref` mutated.
+  """
+  @doc since: "0.4.0"
+  @spec invert(reference) :: reference
+  def invert(ref) when is_reference(ref) do
+    %{size: size} = ref |> :atomics.info()
+
+    do_invert(ref, size)
+  end
+
+  defp do_invert(ref, 0), do: ref
+
+  defp do_invert(ref, index) do
+    inverted_value = bnot(:atomics.get(ref, index))
+
+    :atomics.put(ref, index, inverted_value)
+
+    do_invert(ref, index - 1)
+  end
+
+  @doc """
   Sets the bit at `bit_index` to `bit` in the atomics `ref`.
 
   Returns `:ok`.

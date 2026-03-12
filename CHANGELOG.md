@@ -1,6 +1,7 @@
 # Changelog for Abit
 
 ## v0.4.0
+  * Feature - Implemented set theory missing operations: `Abit.difference/2`, `Abit.symmetric_difference/2`, and `Abit.invert/1`.
   * Deprecation - `Abit.merge/2` is deprecated in favor of `Abit.union/2` to align with standard set theory terminology.
 
 ## v0.3.3

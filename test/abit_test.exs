@@ -77,13 +77,103 @@ defmodule AbitTest do
     ref_b = :atomics.new(2, signed: false)
 
     ref_a |> :atomics.put(1, 321)
-    ref_a |> :atomics.put(2, 1)
-    ref_b |> :atomics.put(2, 123)
+    ref_a |> :atomics.put(2, 123)
+    ref_b |> :atomics.put(2, 122)
 
     intersect_ref = Abit.intersect(ref_a, ref_b)
 
-    assert 0 = :atomics.get(intersect_ref, 1)
-    assert 1 = :atomics.get(intersect_ref, 2)
+    assert :atomics.get(intersect_ref, 1) == 0
+    assert :atomics.get(intersect_ref, 2) == 122
+  end
+
+  test "difference of 2 atomics bit arrays returns left reference" do
+    ref_a = :atomics.new(2, signed: false)
+    ref_b = :atomics.new(2, signed: false)
+
+    ref_a |> :atomics.put(1, 321)
+    ref_b |> :atomics.put(2, 122)
+
+    diff_ref = Abit.difference(ref_a, ref_b)
+
+    assert diff_ref == ref_a
+  end
+
+  test "difference of 2 atomics bit arrays differences values" do
+    ref_a = :atomics.new(2, signed: false)
+    ref_b = :atomics.new(2, signed: false)
+
+    # 321 in binary: 101000001
+    # 320 in binary: 101000000
+    ref_a |> :atomics.put(1, 321)
+    ref_b |> :atomics.put(1, 320)
+
+    # 123 in binary: 1111011
+    # 122 in binary: 1111010
+    ref_a |> :atomics.put(2, 123)
+    ref_b |> :atomics.put(2, 122)
+
+    diff_ref = Abit.difference(ref_a, ref_b)
+
+    assert :atomics.get(diff_ref, 1) == 1
+    assert :atomics.get(diff_ref, 2) == 1
+  end
+
+  test "symmetric_difference of 2 atomics bit arrays returns left reference" do
+    ref_a = :atomics.new(2, signed: false)
+    ref_b = :atomics.new(2, signed: false)
+
+    ref_a |> :atomics.put(1, 321)
+    ref_b |> :atomics.put(2, 122)
+
+    xor_ref = Abit.symmetric_difference(ref_a, ref_b)
+
+    assert xor_ref == ref_a
+  end
+
+  test "symmetric_difference of 2 atomics bit arrays xors values" do
+    ref_a = :atomics.new(2, signed: false)
+    ref_b = :atomics.new(2, signed: false)
+
+    # 321 in binary: 101000001
+    # 320 in binary: 101000000
+    ref_a |> :atomics.put(1, 321)
+    ref_b |> :atomics.put(1, 320)
+
+    # 123 in binary: 1111011
+    # 2 in binary:        10
+    ref_a |> :atomics.put(2, 123)
+    ref_b |> :atomics.put(2, 2)
+
+    xor_ref = Abit.symmetric_difference(ref_a, ref_b)
+
+    assert :atomics.get(xor_ref, 1) == 1
+    assert :atomics.get(xor_ref, 2) == 121
+  end
+
+  test "invert atomics bit arrays returns reference" do
+    ref = :atomics.new(2, signed: true)
+
+    ref |> :atomics.put(1, 321)
+
+    inverted_ref = Abit.invert(ref)
+
+    assert inverted_ref == ref
+  end
+
+  test "invert atomics bit arrays inverts values" do
+    ref = :atomics.new(2, signed: true)
+
+    # Note that atomics defaults to 64-bit integers.
+    # We use bnot to compare so we match 64 bit inverse behavior exactly.
+    ref |> :atomics.put(1, 321)
+    ref |> :atomics.put(2, 0)
+
+    inverted_ref = Abit.invert(ref)
+
+    import Bitwise
+
+    assert :atomics.get(inverted_ref, 1) == bnot(321)
+    assert :atomics.get(inverted_ref, 2) == bnot(0)
   end
 
   test "hamming distance of 2 atomics bit arrays" do

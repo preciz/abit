@@ -27,6 +27,9 @@ See [https://hexdocs.pm/abit](https://hexdocs.pm/abit) for full documentation.
 * `Abit.bit_count/1` - Returns count of bits in atomics.
 * `Abit.union/2` - Unions bits of 2 atomics using Bitwise OR.
 * `Abit.intersect/2` - Intersects bits of 2 atomics using Bitwise AND.
+* `Abit.difference/2` - Clears bits in left atomics that are set in right using Bitwise AND NOT.
+* `Abit.symmetric_difference/2` - Symmetric difference of 2 atomics using Bitwise XOR.
+* `Abit.invert/1` - Inverts all bits in atomics using Bitwise NOT.
 * `Abit.bit_position/1` - Returns the bit's position in an atomics array.
 * `Abit.bit_at/2` - Returns the bit at a given position from atomics.
 * `Abit.set_bit_at/3` - Sets the bit in atomics at the given position to the given bit (0 or 1).
