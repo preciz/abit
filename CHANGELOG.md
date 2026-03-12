@@ -1,6 +1,8 @@
 # Changelog for Abit
 
 ## v0.4.0
+  * Feature - Implemented fast atomics resetting via `Abit.clear/1` and `Abit.Counter.clear/1`.
+  * Feature - Implemented bit toggling via `Abit.toggle_bit_at/2` and `Abit.Bitmask.toggle_bit_at/2`.
   * Feature - Implemented set theory missing operations: `Abit.difference/2`, `Abit.symmetric_difference/2`, and `Abit.invert/1`.
   * Deprecation - `Abit.merge/2` is deprecated in favor of `Abit.union/2` to align with standard set theory terminology.
 

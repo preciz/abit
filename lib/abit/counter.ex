@@ -282,6 +282,26 @@ defmodule Abit.Counter do
   end
 
   @doc """
+  Sets all elements in the given `counter` array to 0.
+
+  Returns `counter`.
+
+  ## Examples
+
+      iex> c = Abit.Counter.new(100, 8)
+      iex> c |> Abit.Counter.put(3, 70)
+      iex> c |> Abit.Counter.clear()
+      iex> c |> Abit.Counter.get(3)
+      0
+  """
+  @doc since: "0.4.0"
+  @spec clear(t) :: t
+  def clear(%Counter{atomics_ref: atomics_ref} = counter) do
+    Abit.clear(atomics_ref)
+    counter
+  end
+
+  @doc """
   Returns all counters from atomics at index.
 
   Index of atomics are one-based.

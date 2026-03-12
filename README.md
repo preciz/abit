@@ -33,10 +33,13 @@ See [https://hexdocs.pm/abit](https://hexdocs.pm/abit) for full documentation.
 * `Abit.bit_position/1` - Returns the bit's position in an atomics array.
 * `Abit.bit_at/2` - Returns the bit at a given position from atomics.
 * `Abit.set_bit_at/3` - Sets the bit in atomics at the given position to the given bit (0 or 1).
+* `Abit.toggle_bit_at/2` - Toggles the bit in atomics at the given position.
+* `Abit.clear/1` - Sets all elements in the atomics reference to 0.
 * `Abit.set_bits_count/1` - Returns the number of bits set to 1 in atomics.
 * `Abit.hamming_distance/2` - Returns the bitwise hamming distance between the 2 given atomics.
 ### Abit.Counter - use `:atomics` as an array of N-bit counters
 * `Abit.Counter.new/2` - Create a new array of counters. Returns %Abit.Counter{} struct.
+* `Abit.Counter.clear/1` - Sets all elements in the counter array to 0.
 * `Abit.Counter.get/2` - Returns the value of counter at the given index.
 * `Abit.Counter.put/3` - Puts the value into counter at the given index.
 * `Abit.Counter.add/3` - Adds the increment to counter at the given index.

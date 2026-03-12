@@ -228,6 +228,45 @@ defmodule Abit do
   end
 
   @doc """
+  Toggles the bit at `bit_index` in the atomics `ref`.
+
+  Returns `:ok`.
+
+  ## Examples
+
+      iex> ref = :atomics.new(1, signed: false)
+      iex> ref |> :atomics.put(1, 1)
+      iex> ref |> Abit.toggle_bit_at(0)
+      :ok
+      iex> ref |> :atomics.get(1)
+      0
+      iex> ref |> Abit.toggle_bit_at(0)
+      iex> ref |> :atomics.get(1)
+      1
+  """
+  @doc since: "0.4.0"
+  @spec toggle_bit_at(reference, non_neg_integer) :: :ok
+  def toggle_bit_at(ref, bit_index) when is_reference(ref) do
+    {atomics_index, integer_bit_index} = bit_position(bit_index)
+
+    current_value = :atomics.get(ref, atomics_index)
+
+    do_toggle_bit_at(ref, atomics_index, integer_bit_index, current_value)
+  end
+
+  defp do_toggle_bit_at(ref, atomics_index, integer_bit_index, current_value) do
+    next_value = Abit.Bitmask.toggle_bit_at(current_value, integer_bit_index)
+
+    case :atomics.compare_exchange(ref, atomics_index, current_value, next_value) do
+      :ok ->
+        :ok
+
+      non_matching_current_value ->
+        do_toggle_bit_at(ref, atomics_index, integer_bit_index, non_matching_current_value)
+    end
+  end
+
+  @doc """
   Returns position of bit in `:atomics`.
 
   Returns a 2 tuple containing:
@@ -376,5 +415,32 @@ defmodule Abit do
     |> Enum.flat_map(fn index ->
       :atomics.get(ref, index) |> Abit.Bitmask.to_list(64)
     end)
+  end
+
+  @doc """
+  Sets all elements in the given atomics reference `ref` to 0.
+
+  Returns `ref`.
+
+  ## Examples
+      iex> ref = :atomics.new(10, signed: false)
+      iex> ref |> Abit.set_bit_at(0, 1)
+      iex> ref |> Abit.set_bit_at(64, 1)
+      iex> ref |> Abit.clear()
+      iex> ref |> Abit.set_bits_count()
+      0
+  """
+  @doc since: "0.4.0"
+  @spec clear(reference) :: reference
+  def clear(ref) when is_reference(ref) do
+    %{size: size} = :atomics.info(ref)
+    do_clear(ref, size)
+  end
+
+  defp do_clear(ref, 0), do: ref
+
+  defp do_clear(ref, index) do
+    :atomics.put(ref, index, 0)
+    do_clear(ref, index - 1)
   end
 end

@@ -246,6 +246,19 @@ defmodule AbitTest do
     assert Abit.set_bits_count(ref) == 51
   end
 
+  test "toggle_bit_at/2 concurrently for the same bit" do
+    ref = :atomics.new(1, signed: false)
+    # Toggling 50 times should result in the bit being set to 0.
+    tasks = for _ <- 1..50, do: Task.async(fn -> Abit.toggle_bit_at(ref, 0) end)
+    Enum.each(tasks, &Task.await/1)
+    assert :atomics.get(ref, 1) == 0
+    
+    # Toggling 51 times should result in the bit being set to 1.
+    tasks = for _ <- 1..51, do: Task.async(fn -> Abit.toggle_bit_at(ref, 0) end)
+    Enum.each(tasks, &Task.await/1)
+    assert :atomics.get(ref, 1) == 1
+  end
+
   describe "bit_position/1" do
     test "returns correct position for first bit" do
       assert Abit.bit_position(0) == {1, 0}

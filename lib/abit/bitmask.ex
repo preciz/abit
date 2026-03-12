@@ -59,7 +59,7 @@ defmodule Abit.Bitmask do
   end
 
   @doc """
-  Sets the bit at `bit_index` in `integer` and returns it.
+  Sets the bit at `bit_index` in `integer` to `bit`.
 
   ## Examples
 
@@ -77,6 +77,24 @@ defmodule Abit.Bitmask do
 
   def set_bit_at(integer, bit_index, 1) do
     integer ||| 1 <<< bit_index
+  end
+
+  @doc """
+  Toggles the bit at `bit_index` in `integer`.
+
+  ## Examples
+
+      iex> Abit.Bitmask.toggle_bit_at(1, 0)
+      0
+      iex> Abit.Bitmask.toggle_bit_at(0, 0)
+      1
+      iex> Abit.Bitmask.toggle_bit_at(1, 2)
+      5
+  """
+  @doc since: "0.4.0"
+  @spec toggle_bit_at(integer, non_neg_integer) :: integer
+  def toggle_bit_at(integer, bit_index) do
+    integer |> bxor(1 <<< bit_index)
   end
 
   @doc """
