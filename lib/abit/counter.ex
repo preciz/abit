@@ -155,7 +155,7 @@ defmodule Abit.Counter do
   end
 
   def put(
-        %Counter{atomics_ref: atomics_ref, signed: signed, counters_bit_size: counters_bit_size},
+        %Counter{atomics_ref: atomics_ref, counters_bit_size: counters_bit_size} = counter,
         index,
         value
       )
@@ -164,12 +164,36 @@ defmodule Abit.Counter do
 
     atomics_value = :atomics.get(atomics_ref, atomics_index)
 
+    do_put(counter, index, value, atomics_index, bit_index, atomics_value)
+  end
+
+  defp do_put(
+         %Counter{
+           atomics_ref: atomics_ref,
+           signed: signed,
+           counters_bit_size: counters_bit_size
+         } = counter,
+         index,
+         value,
+         atomics_index,
+         bit_index,
+         atomics_value
+       ) do
     {final_counter_value, <<next_atomics_value::64>>} =
       put_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>, value)
 
-    :atomics.put(atomics_ref, atomics_index, next_atomics_value)
+    case :atomics.compare_exchange(
+           atomics_ref,
+           atomics_index,
+           atomics_value,
+           next_atomics_value
+         ) do
+      :ok ->
+        {:ok, {index, final_counter_value}}
 
-    {:ok, {index, final_counter_value}}
+      new_atomics_value ->
+        do_put(counter, index, value, atomics_index, bit_index, new_atomics_value)
+    end
   end
 
   @doc """

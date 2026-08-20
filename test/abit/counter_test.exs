@@ -144,6 +144,21 @@ defmodule Abit.CounterTest do
     for i <- 1..8, do: assert Counter.get(counter, i) == 1
   end
 
+  test "put/3 preserves concurrent writes to counters in the same atomics integer" do
+    for _trial <- 1..100 do
+      counter = Counter.new(8, 8, signed: false)
+
+      operations =
+        for index <- 0..7 do
+          fn -> Counter.put(counter, index, index + 1) end
+        end
+
+      run_simultaneously(operations)
+
+      assert Enum.to_list(counter) == Enum.to_list(1..8)
+    end
+  end
+
   test "Enumerable protocol implementation" do
     counter = Counter.new(10, 8)
     Counter.put(counter, 1, 42)
@@ -191,5 +206,31 @@ defmodule Abit.CounterTest do
       assert {:ok, {0, 10}} = Counter.add(c, 0, 266)
       assert Counter.get(c, 0) == 10
     end
+  end
+
+  defp run_simultaneously(operations) do
+    parent = self()
+    gate = make_ref()
+
+    tasks =
+      Enum.map(operations, fn operation ->
+        Task.async(fn ->
+          send(parent, {gate, :ready, self()})
+
+          receive do
+            {^gate, :go} -> operation.()
+          end
+        end)
+      end)
+
+    pids =
+      for _task <- tasks do
+        receive do
+          {^gate, :ready, pid} -> pid
+        end
+      end
+
+    Enum.each(pids, &send(&1, {gate, :go}))
+    Enum.each(tasks, &Task.await/1)
   end
 end

@@ -170,6 +170,41 @@ defmodule AbitTest do
     end
   end
 
+  test "binary operations preserve concurrent updates to the same atomic element" do
+    operation_cases = [
+      {:union, 0, 0xFF},
+      {:intersect, 0xFF, 0},
+      {:difference, 0xFF, 0},
+      {:symmetric_difference, 0, 0xFF}
+    ]
+
+    for {operation, initial_value, expected_value} <- operation_cases,
+        _trial <- 1..100 do
+      ref_l = :atomics.new(1, signed: false)
+      :atomics.put(ref_l, 1, initial_value)
+
+      operations =
+        for bit <- 0..7 do
+          ref_r = :atomics.new(1, signed: false)
+          bit_value = Bitwise.bsl(1, bit)
+
+          right_value =
+            case operation do
+              :intersect -> Bitwise.bxor(0xFF, bit_value)
+              _other -> bit_value
+            end
+
+          :atomics.put(ref_r, 1, right_value)
+
+          fn -> apply(Abit, operation, [ref_l, ref_r]) end
+        end
+
+      run_simultaneously(operations)
+
+      assert :atomics.get(ref_l, 1) == expected_value
+    end
+  end
+
   test "invert atomics bit arrays returns reference" do
     ref = :atomics.new(2, signed: true)
 
@@ -349,5 +384,31 @@ defmodule AbitTest do
       :atomics.put(ref, 2, 0x00000000FFFFFFFF)
       assert Abit.set_bits_count(ref) == 96
     end
+  end
+
+  defp run_simultaneously(operations) do
+    parent = self()
+    gate = make_ref()
+
+    tasks =
+      Enum.map(operations, fn operation ->
+        Task.async(fn ->
+          send(parent, {gate, :ready, self()})
+
+          receive do
+            {^gate, :go} -> operation.()
+          end
+        end)
+      end)
+
+    pids =
+      for _task <- tasks do
+        receive do
+          {^gate, :ready, pid} -> pid
+        end
+      end
+
+    Enum.each(pids, &send(&1, {gate, :go}))
+    Enum.each(tasks, &Task.await/1)
   end
 end

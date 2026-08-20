@@ -100,9 +100,7 @@ defmodule Abit do
   defp do_union(ref_a, _, 0), do: ref_a
 
   defp do_union(ref_a, ref_b, index) do
-    unioned_value = :atomics.get(ref_a, index) ||| :atomics.get(ref_b, index)
-
-    :atomics.put(ref_a, index, unioned_value)
+    update_atomic(ref_a, ref_b, index, :union)
 
     do_union(ref_a, ref_b, index - 1)
   end
@@ -124,9 +122,7 @@ defmodule Abit do
   defp do_intersect(ref_a, _, 0), do: ref_a
 
   defp do_intersect(ref_a, ref_b, index) do
-    intersected_value = :atomics.get(ref_a, index) &&& :atomics.get(ref_b, index)
-
-    :atomics.put(ref_a, index, intersected_value)
+    update_atomic(ref_a, ref_b, index, :intersect)
 
     do_intersect(ref_a, ref_b, index - 1)
   end
@@ -150,9 +146,7 @@ defmodule Abit do
   defp do_difference(ref_a, _, 0), do: ref_a
 
   defp do_difference(ref_a, ref_b, index) do
-    diff_value = :atomics.get(ref_a, index) &&& bnot(:atomics.get(ref_b, index))
-
-    :atomics.put(ref_a, index, diff_value)
+    update_atomic(ref_a, ref_b, index, :difference)
 
     do_difference(ref_a, ref_b, index - 1)
   end
@@ -175,12 +169,34 @@ defmodule Abit do
   defp do_symmetric_difference(ref_a, _, 0), do: ref_a
 
   defp do_symmetric_difference(ref_a, ref_b, index) do
-    xor_value = :atomics.get(ref_a, index) |> bxor(:atomics.get(ref_b, index))
-
-    :atomics.put(ref_a, index, xor_value)
+    update_atomic(ref_a, ref_b, index, :symmetric_difference)
 
     do_symmetric_difference(ref_a, ref_b, index - 1)
   end
+
+  defp update_atomic(ref_a, ref_b, index, operation) do
+    current_value = :atomics.get(ref_a, index)
+
+    do_update_atomic(ref_a, ref_b, index, operation, current_value)
+  end
+
+  defp do_update_atomic(ref_a, ref_b, index, operation, current_value) do
+    other_value = :atomics.get(ref_b, index)
+    next_value = apply_bitwise_operation(operation, current_value, other_value)
+
+    case :atomics.compare_exchange(ref_a, index, current_value, next_value) do
+      :ok ->
+        :ok
+
+      new_current_value ->
+        do_update_atomic(ref_a, ref_b, index, operation, new_current_value)
+    end
+  end
+
+  defp apply_bitwise_operation(:union, left, right), do: left ||| right
+  defp apply_bitwise_operation(:intersect, left, right), do: left &&& right
+  defp apply_bitwise_operation(:difference, left, right), do: left &&& bnot(right)
+  defp apply_bitwise_operation(:symmetric_difference, left, right), do: bxor(left, right)
 
   @doc """
   Inverts all bits in the signed atomics reference `ref` using bitwise NOT.
