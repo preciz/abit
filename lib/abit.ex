@@ -183,14 +183,20 @@ defmodule Abit do
   end
 
   @doc """
-  Inverts all bits in the atomics reference `ref` using bitwise NOT.
+  Inverts all bits in the signed atomics reference `ref` using bitwise NOT.
 
   Mutates and returns `ref`.
+
+  Raises `ArgumentError` if `ref` is unsigned.
   """
   @doc since: "0.4.0"
   @spec invert(reference) :: reference
   def invert(ref) when is_reference(ref) do
-    %{size: size} = ref |> :atomics.info()
+    %{min: min, size: size} = :atomics.info(ref)
+
+    if min == 0 do
+      raise ArgumentError, "Abit.invert/1 only supports signed `:atomics` references."
+    end
 
     do_invert(ref, size)
   end

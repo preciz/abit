@@ -196,6 +196,17 @@ defmodule AbitTest do
     assert :atomics.get(inverted_ref, 2) == bnot(0)
   end
 
+  test "invert rejects unsigned atomics without mutating them" do
+    ref = :atomics.new(1, signed: false)
+    :atomics.put(ref, 1, 68)
+
+    assert_raise ArgumentError, fn ->
+      Abit.invert(ref)
+    end
+
+    assert :atomics.get(ref, 1) == 68
+  end
+
   test "Hamming distance between two atomics bit arrays" do
     ref_l = :atomics.new(10, signed: false)
     ref_r = :atomics.new(10, signed: false)

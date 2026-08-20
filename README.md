@@ -29,7 +29,7 @@ See [https://hexdocs.pm/abit](https://hexdocs.pm/abit) for full documentation.
 * `Abit.intersect/2` - Intersects two atomics references using bitwise AND.
 * `Abit.difference/2` - Clears bits in the left-hand atomics reference that are set in the right-hand reference using bitwise AND NOT.
 * `Abit.symmetric_difference/2` - Computes the symmetric difference of two atomics references using bitwise XOR.
-* `Abit.invert/1` - Inverts all bits in an atomics reference using bitwise NOT.
+* `Abit.invert/1` - Inverts all bits in a signed atomics reference using bitwise NOT.
 * `Abit.bit_position/1` - Returns a bit's position in an atomics array.
 * `Abit.bit_at/2` - Returns the bit at a given position in an atomics reference.
 * `Abit.set_bit_at/3` - Sets the bit at a given position in an atomics reference to 0 or 1.
