@@ -57,10 +57,10 @@ defmodule Abit do
   import Bitwise
 
   @doc """
-  Returns total count of bits in atomics `ref`.
+  Returns the total number of bits in the atomics reference `ref`.
 
-  `:atomics` are 64-bit integers, so the total
-  count of bits is size * 64.
+  Each element in an atomics reference is a 64-bit integer, so the total
+  number of bits is `size * 64`.
 
   ## Examples
 
@@ -77,11 +77,9 @@ defmodule Abit do
   end
 
   @doc """
-  Union bits of atomics `ref_a` & `ref_b` using the
-  bitwise OR operator.
+  Combines the atomics references `ref_a` and `ref_b` using bitwise OR.
 
-  `ref_b` will be unioned into `ref_a`.
-  Returns `ref_a` mutated.
+  Mutates and returns `ref_a`.
   """
   @spec union(reference, reference) :: reference
   def union(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
@@ -108,9 +106,9 @@ defmodule Abit do
   end
 
   @doc """
-  Bit intersection of atomics using Bitwise AND operator.
+  Intersects the atomics references `ref_a` and `ref_b` using bitwise AND.
 
-  Returns `ref_a` mutated.
+  Mutates and returns `ref_a`.
   """
   @spec intersect(reference, reference) :: reference
   def intersect(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
@@ -130,10 +128,10 @@ defmodule Abit do
   end
 
   @doc """
-  Bit difference of atomics using Bitwise AND NOT operators.
+  Computes the difference between `ref_a` and `ref_b` using bitwise AND NOT.
 
   Clears the bits in `ref_a` that are set in `ref_b`.
-  Returns `ref_a` mutated.
+  Mutates and returns `ref_a`.
   """
   @doc since: "0.4.0"
   @spec difference(reference, reference) :: reference
@@ -154,9 +152,9 @@ defmodule Abit do
   end
 
   @doc """
-  Bit symmetric difference (XOR) of atomics using Bitwise XOR operator.
+  Computes the symmetric difference of `ref_a` and `ref_b` using bitwise XOR.
 
-  Returns `ref_a` mutated.
+  Mutates and returns `ref_a`.
   """
   @doc since: "0.4.0"
   @spec symmetric_difference(reference, reference) :: reference
@@ -177,9 +175,9 @@ defmodule Abit do
   end
 
   @doc """
-  Inverts all bits in the atomics reference using Bitwise NOT operator.
+  Inverts all bits in the atomics reference `ref` using bitwise NOT.
 
-  Returns `ref` mutated.
+  Mutates and returns `ref`.
   """
   @doc since: "0.4.0"
   @spec invert(reference) :: reference
@@ -278,7 +276,7 @@ defmodule Abit do
   @doc """
   Returns the position of a bit in `:atomics`.
 
-  Returns a 2-tuple containing:
+  Returns a two-element tuple containing:
     * `atomics_index` - the index of the integer in atomics where the bit is located
     * `bit_index` - the index of the bit in the integer
 
@@ -407,8 +405,7 @@ defmodule Abit do
   end
 
   @doc """
-  Returns a flat list of every atomic value converted
-  into a list of bits from the atomics reference `ref`.
+  Converts every integer in the atomics reference `ref` into a flat list of bits.
 
   ## Examples
       ref = :atomics.new(10, signed: false)

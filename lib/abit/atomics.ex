@@ -6,16 +6,16 @@ defmodule Abit.Atomics do
   @doc """
   Converts an :atomics reference to a list of integers.
 
-  This function takes an :atomics reference and returns a list of integers,
-  where each integer represents the value stored in each atomic.
+  This function takes an `:atomics` reference and returns a list containing
+  the value of each element.
 
   ## Parameters
 
-    * `atomics_ref` - A reference to an :atomics array.
+    * `atomics_ref` - A reference to an `:atomics` array.
 
   ## Returns
 
-  A list of integers representing the values stored in the :atomics array.
+  A list of integers representing the values stored in the `:atomics` array.
 
   ## Examples
 
@@ -41,19 +41,19 @@ defmodule Abit.Atomics do
   end
 
   @doc """
-  Checks if an integer is present in the :atomics reference.
+  Checks whether an integer is present in the `:atomics` reference.
 
-  This function checks if the given integer exists as a value in any of the
-  atomics within the provided :atomics reference.
+  This function checks whether the given integer matches any element in the
+  provided `:atomics` reference.
 
   ## Parameters
 
-    * `atomics_ref` - A reference to an :atomics array.
+    * `atomics_ref` - A reference to an `:atomics` array.
     * `int` - The integer to search for.
 
   ## Returns
 
-  Returns `true` if the integer is found in the :atomics array, `false` otherwise.
+  Returns `true` if the integer is found in the `:atomics` array, or `false` otherwise.
 
   ## Examples
 
@@ -97,18 +97,18 @@ defmodule Abit.Atomics do
   end
 
   @doc """
-  Serializes an :atomics reference into a binary.
+  Serializes an `:atomics` reference into a binary.
 
-  This function takes an :atomics reference and returns a binary where each
-  64-bit integer in the :atomics array is encoded in big-endian format.
+  This function takes an `:atomics` reference and returns a binary in which each
+  64-bit integer is encoded in big-endian format.
 
   ## Parameters
 
-    * `atomics_ref` - A reference to an :atomics array.
+    * `atomics_ref` - A reference to an `:atomics` array.
 
   ## Returns
 
-  A binary containing the serialized :atomics data.
+  A binary containing the serialized `:atomics` data.
 
   ## Examples
 
@@ -142,18 +142,18 @@ defmodule Abit.Atomics do
   end
 
   @doc """
-  Deserializes a binary into an :atomics reference.
+  Deserializes a binary into an `:atomics` reference.
 
   This function takes a binary that was previously serialized using `serialize/1`
-  and reconstructs an :atomics reference from it.
+  and reconstructs an `:atomics` reference from it.
 
   ## Parameters
 
-    * `binary` - A binary containing the serialized :atomics data.
+    * `binary` - A binary containing the serialized `:atomics` data.
 
   ## Returns
 
-  A reference to a new :atomics array containing the deserialized data.
+  A reference to a new `:atomics` array containing the deserialized data.
 
   ## Examples
 

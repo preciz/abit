@@ -1,9 +1,9 @@
 defmodule Abit.Counter do
   @moduledoc """
-  Use `:atomics` as an array of counters with N bits per counter.
-  An `:atomics` is an array of 64-bit integers, so the possible counters are below:
+  Uses `:atomics` as an array of counters with N bits per counter.
+  An `:atomics` reference stores an array of 64-bit integers.
 
-  Possible counters:
+  Supported counter widths and value ranges:
       bits | unsigned value range | signed value range
       2    | 0..3                 | -2..1
       4    | 0..15                | -8..7
@@ -14,13 +14,13 @@ defmodule Abit.Counter do
   If you need 64-bit counters, use
   [Erlang counters](http://erlang.org/doc/man/counters.html)
 
-  The option `:wrap_around` is set to `false` by default. With these
-  smallish counters this is a safe default.
-  When `:wrap_around` is `false` using `put/3` or `add/3` when the value
-  would be out of bounds the error tuple `{:error, :value_out_of_bounds}`
-  will be returned and the stored counter value will not change.
+  The `:wrap_around` option defaults to `false`, which is a safe default for
+  these small counters. When `:wrap_around` is `false` and an operation would
+  produce an out-of-bounds value, `put/3` and `add/3` return
+  `{:error, :value_out_of_bounds}` without changing the stored value.
 
-  While Erlang `:atomics` are 1-indexed, `Abit.Counter` counters are 0-indexed.
+  While Erlang `:atomics` elements are 1-indexed, `Abit.Counter` counters are
+  0-indexed.
 
   ## Enumerable protocol
 
@@ -65,8 +65,8 @@ defmodule Abit.Counter do
   @doc """
   Returns a new `%Abit.Counter{}` struct.
 
-    * `size` - minimum number of counters to have, counters will fully fill the `:atomics`.
-      Check the `:size` key in the returned `%Abit.Counter{}` for the exact number of counters
+    * `size` - the minimum number of counters. Counters fully fill the `:atomics`
+      array, so check the `:size` key in the returned `%Abit.Counter{}` for the exact count.
     * `counters_bit_size` - how many bits a counter should use
 
   ## Options
@@ -110,7 +110,7 @@ defmodule Abit.Counter do
   end
 
   @doc """
-  Returns the value of counter at `index`.
+  Returns the value of the counter at `index`.
 
   ## Examples
 
@@ -134,8 +134,8 @@ defmodule Abit.Counter do
   @doc """
   Puts the value into the counter at `index`.
 
-  Returns `{:ok, {index, final_value}}` or `{:error, :value_out_of_bounds}` if
-  option `wrap_around` is `false` and value is out of bounds.
+  Returns `{:ok, {index, final_value}}`, or `{:error, :value_out_of_bounds}` if
+  `wrap_around` is `false` and the value is out of bounds.
 
   ## Examples
 
@@ -173,10 +173,10 @@ defmodule Abit.Counter do
   end
 
   @doc """
-  Increments the value of the counter at `index` with `incr`.
+  Increments the value of the counter at `index` by `incr`.
 
-  Returns `{:ok, {index, final_value}}` or `{:error, :value_out_of_bounds}` if
-  option `wrap_around` is `false` and value is out of bounds.
+  Returns `{:ok, {index, final_value}}`, or `{:error, :value_out_of_bounds}` if
+  `wrap_around` is `false` and the value is out of bounds.
 
   ## Examples
 
@@ -302,7 +302,7 @@ defmodule Abit.Counter do
   end
 
   @doc """
-  Returns all counters from atomics at index.
+  Returns all counters packed into the atomics element at `index`.
 
   Indices in `:atomics` are one-based.
 
@@ -477,7 +477,7 @@ defmodule Abit.Counter do
     defp do_integer_to_counters(<<>>, _, _, acc), do: acc
   end
 
-  # Returns {min, max} range of counters for given signed & bit_size
+  # Returns the {min, max} counter range for the given signed flag and bit size.
   defp counter_range(signed, bit_size) do
     import Bitwise
 

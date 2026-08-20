@@ -33,7 +33,7 @@ defmodule AbitTest do
     assert 123 = :atomics.get(merged_ref, 2)
   end
 
-  test "union of 2 atomics bit arrays returns left reference" do
+  test "union/2 returns the left atomics reference" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
 
@@ -45,7 +45,7 @@ defmodule AbitTest do
     assert unioned_ref == ref_a
   end
 
-  test "union of 2 atomics bit arrays unions values" do
+  test "union/2 combines values" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
 
@@ -59,7 +59,7 @@ defmodule AbitTest do
     assert 123 = :atomics.get(unioned_ref, 2)
   end
 
-  test "intersect of 2 atomics bit arrays returns left reference" do
+  test "intersect/2 returns the left atomics reference" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
 
@@ -72,7 +72,7 @@ defmodule AbitTest do
     assert intersect_ref == ref_a
   end
 
-  test "intersect of 2 atomics bit arrays intersect values" do
+  test "intersect/2 intersects values" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
 
@@ -86,7 +86,7 @@ defmodule AbitTest do
     assert :atomics.get(intersect_ref, 2) == 122
   end
 
-  test "difference of 2 atomics bit arrays returns left reference" do
+  test "difference/2 returns the left atomics reference" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
 
@@ -98,7 +98,7 @@ defmodule AbitTest do
     assert diff_ref == ref_a
   end
 
-  test "difference of 2 atomics bit arrays differences values" do
+  test "difference/2 clears shared bits" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
 
@@ -118,7 +118,7 @@ defmodule AbitTest do
     assert :atomics.get(diff_ref, 2) == 1
   end
 
-  test "symmetric_difference of 2 atomics bit arrays returns left reference" do
+  test "symmetric_difference/2 returns the left atomics reference" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
 
@@ -130,7 +130,7 @@ defmodule AbitTest do
     assert xor_ref == ref_a
   end
 
-  test "symmetric_difference of 2 atomics bit arrays xors values" do
+  test "symmetric_difference/2 applies XOR to values" do
     ref_a = :atomics.new(2, signed: false)
     ref_b = :atomics.new(2, signed: false)
 
@@ -176,7 +176,7 @@ defmodule AbitTest do
     assert :atomics.get(inverted_ref, 2) == bnot(0)
   end
 
-  test "hamming distance of 2 atomics bit arrays" do
+  test "Hamming distance between two atomics bit arrays" do
     ref_l = :atomics.new(10, signed: false)
     ref_r = :atomics.new(10, signed: false)
     assert 0 == Abit.hamming_distance(ref_l, ref_r)

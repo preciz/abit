@@ -1,6 +1,6 @@
 defmodule Abit.Bitmask do
   @moduledoc """
-  Functions for working with bits & integer bitmasks.
+  Functions for working with bits and integer bitmasks.
   """
 
   import Bitwise
@@ -37,7 +37,7 @@ defmodule Abit.Bitmask do
   end
 
   @doc """
-  Returns bit at `bit_index` in the given `integer`.
+  Returns the bit at `bit_index` in the given `integer`.
 
   ## Examples
 
@@ -120,8 +120,8 @@ defmodule Abit.Bitmask do
   @doc """
   Converts the given `integer` to a list of bits.
 
-  `size` is the size of the bitstring you want the integer to be
-  converted to before creating a list from it.
+  `size` specifies the bitstring size to use before converting the integer
+  to a list.
 
   ## Examples
 

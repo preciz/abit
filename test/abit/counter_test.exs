@@ -42,7 +42,7 @@ defmodule Abit.CounterTest do
     assert is_reference(atomics_ref)
   end
 
-  test "gets & puts & adds value" do
+  test "gets, puts, and adds values" do
     counter = Counter.new(10, 8)
 
     1..10
