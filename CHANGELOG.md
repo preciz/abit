@@ -3,6 +3,7 @@
 ## Unreleased
 
   * Performance - Reduced overhead in bit-array set operations, atomics membership checks, and packed-counter access.
+  * Fix - Added explicit validation and errors for malformed atomics serialization payloads.
   * Tests - Added property-based coverage for bitmasks, atomics operations and serialization, and packed counters.
   * Documentation - Updated installation instructions, package metadata, and Erlang documentation links.
 

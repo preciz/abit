@@ -23,6 +23,22 @@ defmodule Abit.AtomicsPropertyTest do
     end
   end
 
+  property "unknown serialization format tags are rejected" do
+    check all(format <- integer(2..255), payload <- binary(max_length: 32)) do
+      assert_raise ArgumentError, "unknown atomics serialization format tag: #{format}", fn ->
+        Atomics.deserialize(<<format, payload::binary>>)
+      end
+    end
+  end
+
+  property "misaligned serialization payloads are rejected" do
+    check all(format <- member_of([0, 1]), payload <- misaligned_payload()) do
+      assert_raise ArgumentError, ~r/payload size must be a multiple of 8 bytes/, fn ->
+        Atomics.deserialize(<<format, payload::binary>>)
+      end
+    end
+  end
+
   property "membership agrees with the source values" do
     check all({signed, values, candidate} <- membership_case()) do
       ref = atomics_from(values, signed)
@@ -78,6 +94,12 @@ defmodule Abit.AtomicsPropertyTest do
     bind(atomics_values(), fn {signed, values} ->
       candidate = one_of([member_of(values), integer(value_range(signed))])
       tuple({constant(signed), constant(values), candidate})
+    end)
+  end
+
+  defp misaligned_payload do
+    bind(member_of([1, 2, 3, 4, 5, 6, 7, 9, 10, 15, 17, 31]), fn size ->
+      binary(length: size)
     end)
   end
 

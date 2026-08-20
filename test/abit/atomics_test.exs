@@ -80,6 +80,30 @@ defmodule Abit.AtomicsTest do
   end
 
   describe "deserialize/1" do
+    test "rejects an empty binary" do
+      assert_raise ArgumentError, "serialized atomics binary cannot be empty", fn ->
+        Atomics.deserialize(<<>>)
+      end
+    end
+
+    test "rejects an unknown format tag" do
+      assert_raise ArgumentError, "unknown atomics serialization format tag: 2", fn ->
+        Atomics.deserialize(<<2, 0::64>>)
+      end
+    end
+
+    test "rejects a format tag without values" do
+      assert_raise ArgumentError,
+                   "serialized atomics payload must contain at least one 64-bit value",
+                   fn -> Atomics.deserialize(<<0>>) end
+    end
+
+    test "rejects a payload not aligned to 64-bit values" do
+      assert_raise ArgumentError,
+                   "serialized atomics payload size must be a multiple of 8 bytes, got 1",
+                   fn -> Atomics.deserialize(<<1, 0>>) end
+    end
+
     test "deserializes unsigned atomics" do
       original_ref = :atomics.new(3, signed: false)
       :atomics.put(original_ref, 1, 10)

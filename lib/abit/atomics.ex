@@ -3,6 +3,10 @@ defmodule Abit.Atomics do
   This module provides utility functions for working with Erlang's :atomics.
   """
 
+  @unsigned_format 0
+  @signed_format 1
+  @bytes_per_value 8
+
   @doc """
   Converts an :atomics reference to a list of integers.
 
@@ -122,8 +126,8 @@ defmodule Abit.Atomics do
 
   defp signature_byte(atomics_ref) when is_reference(atomics_ref) do
     case :atomics.info(atomics_ref) do
-      %{min: 0} -> <<0>>
-      %{min: n} when n < 0 -> <<1>>
+      %{min: 0} -> <<@unsigned_format>>
+      %{min: n} when n < 0 -> <<@signed_format>>
     end
   end
 
@@ -139,6 +143,13 @@ defmodule Abit.Atomics do
 
   This function takes a binary that was previously serialized using `serialize/1`
   and reconstructs an `:atomics` reference from it.
+
+  The first byte is a format tag: `0` for unsigned values or `1` for signed
+  values. It is followed by one or more big-endian 64-bit values. Other tags
+  are reserved for future formats.
+
+  Raises `ArgumentError` when the binary is empty, has an unknown format tag,
+  contains no values, or has a payload that is not aligned to 64-bit values.
 
   ## Parameters
 
@@ -161,17 +172,40 @@ defmodule Abit.Atomics do
   """
   @doc since: "0.3.3"
   @spec deserialize(binary()) :: reference()
-  def deserialize(<<signature_byte::8, rest::binary>>) do
-    signed? =
-      case signature_byte do
-        0 -> false
-        1 -> true
-      end
+  def deserialize(<<>>) do
+    raise ArgumentError, "serialized atomics binary cannot be empty"
+  end
 
-    size = byte_size(rest) |> div(8)
+  def deserialize(<<format, payload::binary>>) do
+    signed? = decode_format!(format)
+    size = payload_size!(payload)
+
     atomics_ref = :atomics.new(size, signed: signed?)
-    do_deserialize(signed?, atomics_ref, rest, 1)
+    do_deserialize(signed?, atomics_ref, payload, 1)
     atomics_ref
+  end
+
+  defp decode_format!(@unsigned_format), do: false
+  defp decode_format!(@signed_format), do: true
+
+  defp decode_format!(format) do
+    raise ArgumentError, "unknown atomics serialization format tag: #{format}"
+  end
+
+  defp payload_size!(<<>>) do
+    raise ArgumentError, "serialized atomics payload must contain at least one 64-bit value"
+  end
+
+  defp payload_size!(payload) do
+    byte_size = byte_size(payload)
+
+    if rem(byte_size, @bytes_per_value) == 0 do
+      div(byte_size, @bytes_per_value)
+    else
+      raise ArgumentError,
+            "serialized atomics payload size must be a multiple of #{@bytes_per_value} bytes, " <>
+              "got #{byte_size}"
+    end
   end
 
   defp do_deserialize(_signed, _atomics_ref, <<>>, _index), do: :ok
