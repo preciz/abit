@@ -94,7 +94,8 @@ defmodule Abit.Counter do
     signed = options |> Keyword.get(:signed, true)
     wrap_around = options |> Keyword.get(:wrap_around, false)
 
-    atomics_size = Float.ceil(size / (64 / counters_bit_size)) |> round()
+    counters_per_atomic = div(64, counters_bit_size)
+    atomics_size = div(size + counters_per_atomic - 1, counters_per_atomic)
 
     atomics_ref = :atomics.new(atomics_size, signed: false)
 
@@ -104,7 +105,7 @@ defmodule Abit.Counter do
       atomics_ref: atomics_ref,
       signed: signed,
       wrap_around: wrap_around,
-      size: atomics_size * round(64 / counters_bit_size),
+      size: atomics_size * counters_per_atomic,
       counters_bit_size: counters_bit_size,
       min: min,
       max: max
@@ -126,7 +127,7 @@ defmodule Abit.Counter do
         index
       )
       when index >= 0 do
-    {atomics_index, bit_index} = Abit.bit_position(counters_bit_size * index)
+    {atomics_index, bit_index} = counter_position(index, counters_bit_size)
 
     atomics_value = :atomics.get(atomics_ref, atomics_index)
 
@@ -162,7 +163,7 @@ defmodule Abit.Counter do
         value
       )
       when index >= 0 do
-    {atomics_index, bit_index} = Abit.bit_position(counters_bit_size * index)
+    {atomics_index, bit_index} = counter_position(index, counters_bit_size)
 
     atomics_value = :atomics.get(atomics_ref, atomics_index)
 
@@ -229,7 +230,7 @@ defmodule Abit.Counter do
         incr
       )
       when index >= 0 do
-    {atomics_index, bit_index} = Abit.bit_position(counters_bit_size * index)
+    {atomics_index, bit_index} = counter_position(index, counters_bit_size)
 
     atomics_value = :atomics.get(atomics_ref, atomics_index)
 
@@ -414,6 +415,11 @@ defmodule Abit.Counter do
   defp get_value(signed, bit_size, bit_index, atomic) do
     value = atomic >>> bit_index &&& bit_mask(bit_size)
     decode_value(value, signed, bit_size)
+  end
+
+  defp counter_position(index, bit_size) do
+    bit_index = bit_size * index
+    {div(bit_index, 64) + 1, rem(bit_index, 64)}
   end
 
   defp put_value(signed, bit_size, bit_index, atomic, new_value) do

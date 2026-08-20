@@ -79,21 +79,14 @@ defmodule Abit.Atomics do
         false
 
       _else ->
-        do_member?(atomics_ref, int, size, false)
+        do_member?(atomics_ref, int, size)
     end
   end
 
-  defp do_member?(_, _, _, true), do: true
+  defp do_member?(_, _, 0), do: false
 
-  defp do_member?(_, _, 0, false), do: false
-
-  defp do_member?(atomics_ref, int, index, false) do
-    do_member?(
-      atomics_ref,
-      int,
-      index - 1,
-      :atomics.get(atomics_ref, index) == int
-    )
+  defp do_member?(atomics_ref, int, index) do
+    :atomics.get(atomics_ref, index) == int or do_member?(atomics_ref, int, index - 1)
   end
 
   @doc """

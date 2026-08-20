@@ -87,7 +87,7 @@ defmodule Abit do
   def union(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     size = ensure_same_size!(ref_a, ref_b)
 
-    do_union(ref_a, ref_b, size)
+    do_combine(ref_a, ref_b, size, :union)
   end
 
   @doc false
@@ -95,14 +95,6 @@ defmodule Abit do
   @spec merge(reference, reference) :: reference
   def merge(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     union(ref_a, ref_b)
-  end
-
-  defp do_union(ref_a, _, 0), do: ref_a
-
-  defp do_union(ref_a, ref_b, index) do
-    update_atomic(ref_a, ref_b, index, :union)
-
-    do_union(ref_a, ref_b, index - 1)
   end
 
   @doc """
@@ -116,15 +108,7 @@ defmodule Abit do
   def intersect(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     size = ensure_same_size!(ref_a, ref_b)
 
-    do_intersect(ref_a, ref_b, size)
-  end
-
-  defp do_intersect(ref_a, _, 0), do: ref_a
-
-  defp do_intersect(ref_a, ref_b, index) do
-    update_atomic(ref_a, ref_b, index, :intersect)
-
-    do_intersect(ref_a, ref_b, index - 1)
+    do_combine(ref_a, ref_b, size, :intersect)
   end
 
   @doc """
@@ -140,15 +124,7 @@ defmodule Abit do
   def difference(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     size = ensure_same_size!(ref_a, ref_b)
 
-    do_difference(ref_a, ref_b, size)
-  end
-
-  defp do_difference(ref_a, _, 0), do: ref_a
-
-  defp do_difference(ref_a, ref_b, index) do
-    update_atomic(ref_a, ref_b, index, :difference)
-
-    do_difference(ref_a, ref_b, index - 1)
+    do_combine(ref_a, ref_b, size, :difference)
   end
 
   @doc """
@@ -163,15 +139,15 @@ defmodule Abit do
   def symmetric_difference(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
     size = ensure_same_size!(ref_a, ref_b)
 
-    do_symmetric_difference(ref_a, ref_b, size)
+    do_combine(ref_a, ref_b, size, :symmetric_difference)
   end
 
-  defp do_symmetric_difference(ref_a, _, 0), do: ref_a
+  defp do_combine(ref_a, _, 0, _operation), do: ref_a
 
-  defp do_symmetric_difference(ref_a, ref_b, index) do
-    update_atomic(ref_a, ref_b, index, :symmetric_difference)
+  defp do_combine(ref_a, ref_b, index, operation) do
+    update_atomic(ref_a, ref_b, index, operation)
 
-    do_symmetric_difference(ref_a, ref_b, index - 1)
+    do_combine(ref_a, ref_b, index - 1, operation)
   end
 
   defp update_atomic(ref_a, ref_b, index, operation) do
