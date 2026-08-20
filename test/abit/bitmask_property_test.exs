@@ -6,7 +6,7 @@ defmodule Abit.BitmaskPropertyTest do
 
   alias Abit.Bitmask
 
-  @min_signed_64 -(1 <<< 63)
+  @min_signed_64 -1 <<< 63
   @max_unsigned_64 (1 <<< 64) - 1
 
   property "64-bit list conversion and population count agree" do

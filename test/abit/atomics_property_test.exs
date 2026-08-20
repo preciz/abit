@@ -7,7 +7,7 @@ defmodule Abit.AtomicsPropertyTest do
   alias Abit.Atomics
   alias Abit.Bitmask
 
-  @min_signed_64 -(1 <<< 63)
+  @min_signed_64 -1 <<< 63
   @max_signed_64 (1 <<< 63) - 1
   @max_unsigned_64 (1 <<< 64) - 1
 
