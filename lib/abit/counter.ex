@@ -1,7 +1,7 @@
 defmodule Abit.Counter do
   @moduledoc """
   Use `:atomics` as an array of counters with N bits per counter.
-  An `:atomics` is an array of 64 bit integers so the possible counters are below:
+  An `:atomics` is an array of 64-bit integers, so the possible counters are below:
 
   Possible counters:
       bits | unsigned value range | signed value range
@@ -11,7 +11,7 @@ defmodule Abit.Counter do
       16   | 0..65535             | -32768..32767
       32   | 0..4294967295        | -2147483648..2147483647
 
-  If you need 64 bit counters use
+  If you need 64-bit counters, use
   [Erlang counters](http://erlang.org/doc/man/counters.html)
 
   The option `:wrap_around` is set to `false` by default. With these
@@ -20,7 +20,7 @@ defmodule Abit.Counter do
   would be out of bounds the error tuple `{:error, :value_out_of_bounds}`
   will be returned and the stored counter value will not change.
 
-  While Erlang `:atomics` are 1 indexed, `Abit.Counter` counters are 0 indexed.
+  While Erlang `:atomics` are 1-indexed, `Abit.Counter` counters are 0-indexed.
 
   ## Enumerable protocol
 
@@ -85,7 +85,7 @@ defmodule Abit.Counter do
       when is_integer(size) and is_integer(counters_bit_size) do
     if counters_bit_size not in @bit_sizes do
       raise ArgumentError,
-            "You can't create an %Abit.Counter{} with counters_bit_size #{counters_bit_size}." <>
+            "You can't create a %Abit.Counter{} with counters_bit_size #{counters_bit_size}. " <>
               "Possible values are #{inspect(@bit_sizes)}"
     end
 
@@ -304,7 +304,7 @@ defmodule Abit.Counter do
   @doc """
   Returns all counters from atomics at index.
 
-  Index of atomics are one-based.
+  Indices in `:atomics` are one-based.
 
   ## Examples
 

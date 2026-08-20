@@ -7,7 +7,7 @@
   * Deprecation - `Abit.merge/2` is deprecated in favor of `Abit.union/2` to align with standard set theory terminology.
 
 ## v0.3.3
-  * Feauter - `Abit.Atomics` implements `serialize/1` and `deserialize/1` functions.
+  * Feature - `Abit.Atomics` implements `serialize/1` and `deserialize/1` functions.
 
 ## v0.3.2
   * Fix - compile warning about using `^^^/2` in `Abit.Counter`
@@ -24,7 +24,7 @@
 ## v0.2.3
   * Feature - `Abit.Matrix` implements `add/3`, `exchange/3`, `compare_exchange/4`, `min/1`, `max/1`, ... functions.
   * Feature - `Abit.Matrix` implements the `Enumerable` protocol
-  * Feature - `Abit.Bitmask` implements `to_list/2`function.
+  * Feature - `Abit.Bitmask` implements `to_list/2` function.
   * Feature - `Abit` implements `to_list/1` function.
 
 ## v0.2.2
@@ -42,4 +42,3 @@
   * BREAKING - Added an option `wrap_around` to set wrap around behavior. By default wrap around is disabled from now on.
   * BREAKING - Using built-in signed/unsigned implementation of integer matching instead of the custom one. Signed integers now wrap around the same way as in Elixir.
   * BREAKING - The return value of `put/3` and `add/3` changed to `{:ok, {index, final_value}}` or `{:error, :value_out_of_bounds}` if the option `wrap_around` is set to false and value is out of bounds.
-

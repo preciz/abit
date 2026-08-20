@@ -164,7 +164,7 @@ defmodule AbitTest do
     ref = :atomics.new(2, signed: true)
 
     # Note that atomics defaults to 64-bit integers.
-    # We use bnot to compare so we match 64 bit inverse behavior exactly.
+    # We use bnot to compare so we match 64-bit inverse behavior exactly.
     ref |> :atomics.put(1, 321)
     ref |> :atomics.put(2, 0)
 
@@ -194,7 +194,7 @@ defmodule AbitTest do
     assert 1 == Abit.hamming_distance(ref_l, ref_r)
   end
 
-  test "hamming_distance raises if sizes of atomics are non equal" do
+  test "hamming_distance raises if sizes of atomics are unequal" do
     assert_raise ArgumentError, fn ->
       ref_l = :atomics.new(1, signed: false)
       ref_r = :atomics.new(2, signed: false)

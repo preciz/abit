@@ -2,17 +2,17 @@ defmodule Abit do
   @moduledoc """
   Abit lets you use `:atomics` as a bit array or as an array of N-bit counters.
 
-  To know more about `:atomics` check the [Erlang atomics documentation](http://erlang.org/doc/man/atomics.html)
+  To learn more about `:atomics`, see the [Erlang atomics documentation](http://erlang.org/doc/man/atomics.html).
 
   The `Abit` module (this module) has functions to use `:atomics` as a bit array.
-  The bit array is zero indexed.
+  The bit array is zero-indexed.
 
   The `Abit.Counter` module has functions to use `:atomics` as an array of N-bit
   counters.
 
-  The functions in `Abit.Atomics` help working with Erlang's `:atomics`.
+  The functions in `Abit.Atomics` help you work with Erlang's `:atomics`.
 
-  The functions in `Abit.Bitmask` help working with bitmasks.
+  The functions in `Abit.Bitmask` help you work with bitmasks.
 
   ## Abit
 
@@ -59,7 +59,7 @@ defmodule Abit do
   @doc """
   Returns total count of bits in atomics `ref`.
 
-  `:atomics` are 64 bit integers so total
+  `:atomics` are 64-bit integers, so the total
   count of bits is size * 64.
 
   ## Examples
@@ -276,9 +276,9 @@ defmodule Abit do
   end
 
   @doc """
-  Returns position of bit in `:atomics`.
+  Returns the position of a bit in `:atomics`.
 
-  Returns a 2 tuple containing:
+  Returns a 2-tuple containing:
     * `atomics_index` - the index of the integer in atomics where the bit is located
     * `bit_index` - the index of the bit in the integer
 
@@ -301,7 +301,7 @@ defmodule Abit do
   end
 
   @doc """
-  Returns bit at `bit_index` in atomic `ref`.
+  Returns the bit at `bit_index` in the atomics reference `ref`.
 
   ## Examples
 
@@ -328,7 +328,7 @@ defmodule Abit do
   end
 
   @doc """
-  Returns number of bits set to 1 in atomics array `ref`.
+  Returns the number of bits set to 1 in the atomics array `ref`.
 
   ## Examples
 
@@ -408,7 +408,7 @@ defmodule Abit do
 
   @doc """
   Returns a flat list of every atomic value converted
-  into a list of bits from `ref` atomics reference.
+  into a list of bits from the atomics reference `ref`.
 
   ## Examples
       ref = :atomics.new(10, signed: false)
