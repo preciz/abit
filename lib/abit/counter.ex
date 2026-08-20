@@ -45,6 +45,8 @@ defmodule Abit.Counter do
 
   @bit_sizes [2, 4, 8, 16, 32]
 
+  import Bitwise
+
   alias Abit.Counter
 
   @keys [:atomics_ref, :signed, :wrap_around, :size, :counters_bit_size, :min, :max]
@@ -128,7 +130,7 @@ defmodule Abit.Counter do
 
     atomics_value = :atomics.get(atomics_ref, atomics_index)
 
-    get_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>)
+    get_value(signed, counters_bit_size, bit_index, atomics_value)
   end
 
   @doc """
@@ -179,8 +181,8 @@ defmodule Abit.Counter do
          bit_index,
          atomics_value
        ) do
-    {final_counter_value, <<next_atomics_value::64>>} =
-      put_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>, value)
+    {final_counter_value, next_atomics_value} =
+      put_value(signed, counters_bit_size, bit_index, atomics_value, value)
 
     case :atomics.compare_exchange(
            atomics_ref,
@@ -231,7 +233,7 @@ defmodule Abit.Counter do
 
     atomics_value = :atomics.get(atomics_ref, atomics_index)
 
-    current_value = get_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>)
+    current_value = get_value(signed, counters_bit_size, bit_index, atomics_value)
 
     next_value = current_value + incr
 
@@ -240,8 +242,8 @@ defmodule Abit.Counter do
         {:error, :value_out_of_bounds}
 
       {_, _} ->
-        {final_counter_value, <<next_atomics_value::64>>} =
-          put_value(signed, counters_bit_size, bit_index, <<atomics_value::64>>, next_value)
+        {final_counter_value, next_atomics_value} =
+          put_value(signed, counters_bit_size, bit_index, atomics_value, next_value)
 
         case :atomics.compare_exchange(
                atomics_ref,
@@ -409,71 +411,30 @@ defmodule Abit.Counter do
     end
   end
 
-  @bit_sizes
-  |> Enum.each(fn counters_bit_size ->
-    0..63
-    |> Enum.filter(fn n -> rem(n, counters_bit_size) == 0 end)
-    |> Enum.each(fn bit_index ->
-      bit_left_start = bit_index + counters_bit_size
-      left_bits = 64 - bit_left_start
-      right_bits = bit_left_start - counters_bit_size
+  defp get_value(signed, bit_size, bit_index, atomic) do
+    value = atomic >>> bit_index &&& bit_mask(bit_size)
+    decode_value(value, signed, bit_size)
+  end
 
-      defp unquote(:get_value)(
-             false,
-             unquote(counters_bit_size),
-             unquote(bit_index),
-             <<_::unquote(left_bits), value::unquote(counters_bit_size), _::unquote(right_bits)>>
-           ) do
-        value
-      end
+  defp put_value(signed, bit_size, bit_index, atomic, new_value) do
+    mask = bit_mask(bit_size)
+    encoded_value = new_value &&& mask
+    shifted_mask = mask <<< bit_index
+    next_atomic = (atomic &&& bnot(shifted_mask)) ||| encoded_value <<< bit_index
 
-      defp unquote(:get_value)(
-             true,
-             unquote(counters_bit_size),
-             unquote(bit_index),
-             <<_left::unquote(left_bits), value::unquote(counters_bit_size)-signed,
-               _right::unquote(right_bits)>>
-           ) do
-        value
-      end
+    {decode_value(encoded_value, signed, bit_size), next_atomic}
+  end
 
-      defp unquote(:put_value)(
-             false,
-             unquote(counters_bit_size),
-             unquote(bit_index),
-             <<left::unquote(left_bits), _current_value::unquote(counters_bit_size),
-               right::unquote(right_bits)>>,
-             new_value
-           ) do
-        <<final_counter_value::unquote(counters_bit_size)>> =
-          <<new_value::unquote(counters_bit_size)>>
+  defp decode_value(value, false, _bit_size), do: value
 
-        {
-          final_counter_value,
-          <<left::unquote(left_bits), new_value::unquote(counters_bit_size),
-            right::unquote(right_bits)>>
-        }
-      end
+  defp decode_value(value, true, bit_size) do
+    sign_bit = 1 <<< (bit_size - 1)
+    if (value &&& sign_bit) == 0, do: value, else: value - (sign_bit <<< 1)
+  end
 
-      defp unquote(:put_value)(
-             true,
-             unquote(counters_bit_size),
-             unquote(bit_index),
-             <<left::unquote(left_bits), _current_value::unquote(counters_bit_size)-signed,
-               right::unquote(right_bits)>>,
-             new_value
-           ) do
-        <<final_counter_value::unquote(counters_bit_size)-signed>> =
-          <<new_value::unquote(counters_bit_size)-signed>>
-
-        {
-          final_counter_value,
-          <<left::unquote(left_bits), new_value::unquote(counters_bit_size)-signed,
-            right::unquote(right_bits)>>
-        }
-      end
-    end)
-  end)
+  for bit_size <- @bit_sizes do
+    defp bit_mask(unquote(bit_size)), do: unquote((1 <<< bit_size) - 1)
+  end
 
   defp integer_to_counters(integer, signed, bit_size) do
     do_integer_to_counters(<<integer::64>>, signed, bit_size, [])
@@ -503,8 +464,6 @@ defmodule Abit.Counter do
 
   # Returns the {min, max} counter range for the given signed flag and bit size.
   defp counter_range(signed, bit_size) do
-    import Bitwise
-
     case signed do
       false -> {0, (1 <<< bit_size) - 1}
       true -> {-(1 <<< (bit_size - 1)), (1 <<< (bit_size - 1)) - 1}
