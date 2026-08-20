@@ -1,7 +1,7 @@
 defmodule Abit.MixProject do
   use Mix.Project
 
-  @version "0.4.0"
+  @version "1.0.0"
   @github "https://github.com/preciz/abit"
 
   def project do
@@ -9,7 +9,7 @@ defmodule Abit.MixProject do
       app: :abit,
       name: "Abit",
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       docs: docs(),

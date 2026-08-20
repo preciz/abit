@@ -141,7 +141,7 @@ defmodule Abit.CounterTest do
     counter = Counter.new(10, 8)
     tasks = for i <- 1..8, do: Task.async(fn -> Counter.add(counter, i, 1) end)
     Enum.each(tasks, &Task.await/1)
-    for i <- 1..8, do: assert Counter.get(counter, i) == 1
+    for i <- 1..8, do: assert(Counter.get(counter, i) == 1)
   end
 
   test "put/3 preserves concurrent writes to counters in the same atomics integer" do
@@ -170,17 +170,17 @@ defmodule Abit.CounterTest do
     refute Enum.member?(counter, 101)
 
     assert Enum.max(counter) == 100
-    
+
     # This covers `do_reduce` with `{:halt, acc}` and `fun` invocation
     assert Enum.take(counter, 4) == [0, 42, 0, 100]
-    
+
     # This covers `do_reduce` reaching the `done` state
     assert Enum.sum(counter) == 142
     assert Enum.to_list(counter) |> length() == 16
 
     # This covers `do_slice` function via `Enum.slice`
     assert Enum.slice(counter, 1..3) == [42, 0, 100]
-    
+
     # This covers `do_reduce` with `{:suspend, acc}`
     assert Enum.zip(counter, [1, 2, 3]) |> Enum.to_list() == [{0, 1}, {42, 2}, {0, 3}]
   end
@@ -192,14 +192,14 @@ defmodule Abit.CounterTest do
         Counter.new(0, 8)
       end
     end
-    
+
     test "put with negative value when wrap_around is true" do
       c = Counter.new(10, 8, wrap_around: true, signed: false)
       # -1 wrapping around in 8-bit unsigned becomes 255
       assert {:ok, {0, 255}} = Counter.put(c, 0, -1)
       assert Counter.get(c, 0) == 255
     end
-    
+
     test "add with very large increment wrapping around multiple times" do
       c = Counter.new(10, 8, wrap_around: true, signed: false)
       # 256 + 10 = 266 -> wraps around 256 to 10

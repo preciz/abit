@@ -1,12 +1,23 @@
 defmodule Abit.Bitmask do
   @moduledoc """
   Functions for working with bits and integer bitmasks.
+
+  `set_bits_count/1` and `hamming_distance/2` treat integers as 64-bit
+  bitmasks: they inspect bits 0 through 63 and ignore higher bits. Negative
+  integers are interpreted using their lowest 64 two's-complement bits.
+
+  The indexed operations are not capped at 64 bits, and `to_list/2` uses the
+  explicit size supplied by the caller.
   """
 
   import Bitwise
 
   @doc """
   Returns the count of bits set to 1 in the given integer `int`.
+
+  Only the lowest 64 bits are counted. Bits above bit 63 are ignored, and
+  negative integers are interpreted using their lowest 64 two's-complement
+  bits.
 
   ## Examples
 
@@ -19,21 +30,22 @@ defmodule Abit.Bitmask do
       iex> Abit.Bitmask.set_bits_count(1023)
       10
   """
-  @popcount_table (for i <- 0..255,
-                        do:
-                          for(<<b::1 <- <<i::8>> >>, b == 1, reduce: 0, do: (acc -> acc + 1)))
+  @popcount_table for(
+                    i <- 0..255,
+                    do: for(<<(b::1 <- <<i::8>>)>>, b == 1, reduce: 0, do: (acc -> acc + 1))
+                  )
                   |> List.to_tuple()
 
   @spec set_bits_count(integer) :: non_neg_integer
   def set_bits_count(int) when is_integer(int) do
     elem(@popcount_table, int &&& 255) +
-      elem(@popcount_table, (int >>> 8) &&& 255) +
-      elem(@popcount_table, (int >>> 16) &&& 255) +
-      elem(@popcount_table, (int >>> 24) &&& 255) +
-      elem(@popcount_table, (int >>> 32) &&& 255) +
-      elem(@popcount_table, (int >>> 40) &&& 255) +
-      elem(@popcount_table, (int >>> 48) &&& 255) +
-      elem(@popcount_table, (int >>> 56) &&& 255)
+      elem(@popcount_table, int >>> 8 &&& 255) +
+      elem(@popcount_table, int >>> 16 &&& 255) +
+      elem(@popcount_table, int >>> 24 &&& 255) +
+      elem(@popcount_table, int >>> 32 &&& 255) +
+      elem(@popcount_table, int >>> 40 &&& 255) +
+      elem(@popcount_table, int >>> 48 &&& 255) +
+      elem(@popcount_table, int >>> 56 &&& 255)
   end
 
   @doc """
@@ -100,6 +112,10 @@ defmodule Abit.Bitmask do
   @doc """
   Returns the bitwise Hamming distance between the
   given integers `int_l` and `int_r`.
+
+  The distance covers only the lowest 64 bits. Bits above bit 63 are ignored,
+  and negative integers are interpreted using their lowest 64
+  two's-complement bits.
 
   ## Examples
 

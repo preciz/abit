@@ -8,14 +8,14 @@ See the [API documentation](https://hexdocs.pm/abit) on HexDocs.
 
 ## Installation
 
-Abit requires Elixir 1.7 or later and OTP 21.2.1 or later.
+Abit requires Elixir 1.14 or later and OTP 25 or later.
 
 Add `abit` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:abit, "~> 0.4"}
+    {:abit, "~> 1.0"}
   ]
 end
 ```
@@ -60,6 +60,11 @@ Operations that write to an `:atomics` reference mutate it in place. See the
 * `Abit.Counter.get_all_at_atomic/2` - Returns all counters packed into the atomics element at the given index.
 
 ### Abit.Bitmask - helper functions for bitmasks
+
+Population counts and Hamming distances cover only the lowest 64 bits. Indexed
+operations can address higher bit positions, while `to_list/2` uses its explicit
+size argument.
+
 * `Abit.Bitmask.set_bits_count/1` - Returns the number of bits set to 1 in the given integer.
 * `Abit.Bitmask.bit_at/2` - Returns the bit at a given position in the given integer.
 * `Abit.Bitmask.set_bit_at/3` - Sets a bit in the given integer at the given position to a given bit (0 or 1).

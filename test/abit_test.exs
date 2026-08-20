@@ -27,7 +27,7 @@ defmodule AbitTest do
     ref_a |> :atomics.put(1, 321)
     ref_b |> :atomics.put(2, 123)
 
-    merged_ref = Abit.merge(ref_a, ref_b)
+    merged_ref = apply(Abit, :merge, [ref_a, ref_b])
     assert merged_ref == ref_a
     assert 321 = :atomics.get(merged_ref, 1)
     assert 123 = :atomics.get(merged_ref, 2)
@@ -307,14 +307,14 @@ defmodule AbitTest do
 
   test "set_bit_at/3 concurrently for different bits" do
     ref = :atomics.new(1, signed: false)
-    
+
     # Spawn tasks that toggle bit 0 concurrently to create contention on the atomics integer
     toggle_tasks = for _ <- 1..500, do: Task.async(fn -> Abit.toggle_bit_at(ref, 63) end)
-    
+
     tasks = for i <- 0..50, do: Task.async(fn -> Abit.set_bit_at(ref, i, 1) end)
-    
+
     Enum.each(toggle_tasks ++ tasks, &Task.await/1)
-    
+
     # All bits 0..50 should be set
     for i <- 0..50 do
       assert Abit.bit_at(ref, i) == 1
@@ -327,7 +327,7 @@ defmodule AbitTest do
     tasks = for _ <- 1..500, do: Task.async(fn -> Abit.toggle_bit_at(ref, 0) end)
     Enum.each(tasks, &Task.await/1)
     assert :atomics.get(ref, 1) == 0
-    
+
     # Toggling 501 times should result in the bit being set to 1.
     tasks = for _ <- 1..501, do: Task.async(fn -> Abit.toggle_bit_at(ref, 0) end)
     Enum.each(tasks, &Task.await/1)

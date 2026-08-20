@@ -1,11 +1,13 @@
 # Changelog for Abit
 
-## Unreleased
+## v1.0.0 - 2026-08-20
 
+  * Stability - Declared the existing public API stable for the first major release.
+  * Breaking - Raised the minimum supported versions to Elixir 1.14 and OTP 25.
   * Performance - Reduced overhead in bit-array set operations, atomics membership checks, and packed-counter access.
   * Fix - Added explicit validation and errors for malformed atomics serialization payloads.
   * Tests - Added property-based coverage for bitmasks, atomics operations and serialization, and packed counters.
-  * Documentation - Updated installation instructions, package metadata, and Erlang documentation links.
+  * Documentation - Updated installation instructions, package metadata, Erlang documentation links, and the 64-bit bitmask contract.
 
 ## v0.4.0
   * Feature - Added fast atomics resetting via `Abit.clear/1` and `Abit.Counter.clear/1`.

@@ -92,7 +92,7 @@ defmodule Abit.BitmaskTest do
       assert Bitmask.set_bit_at(10, -1, 1) == 10
       assert Bitmask.set_bit_at(10, -1, 0) == 10
     end
-    
+
     test "hamming_distance with integers larger than 64 bits" do
       # Since it uses set_bits_count, it also ignores bits above 64.
       assert Bitmask.hamming_distance(1 <<< 65, 0) == 0
