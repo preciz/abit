@@ -1,10 +1,16 @@
 # Changelog for Abit
 
+## Unreleased
+
+  * Performance - Reduced overhead in bit-array set operations, atomics membership checks, and packed-counter access.
+  * Tests - Added property-based coverage for bitmasks, atomics operations and serialization, and packed counters.
+  * Documentation - Updated installation instructions, package metadata, and Erlang documentation links.
+
 ## v0.4.0
   * Feature - Added fast atomics resetting via `Abit.clear/1` and `Abit.Counter.clear/1`.
   * Feature - Added bit toggling via `Abit.toggle_bit_at/2` and `Abit.Bitmask.toggle_bit_at/2`.
   * Feature - Added the missing set operations: `Abit.difference/2`, `Abit.symmetric_difference/2`, and `Abit.invert/1`.
-  * Deprecation - Deprecated `Abit.merge/2` in favor of `Abit.union/2` to align with standard set theory terminology.
+  * Deprecation - Deprecated Abit.merge/2 in favor of `Abit.union/2` to align with standard set theory terminology.
 
 ## v0.3.3
   * Feature - Added `Abit.Atomics.serialize/1` and `Abit.Atomics.deserialize/1`.

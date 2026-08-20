@@ -2,26 +2,31 @@
 
 [![test](https://github.com/preciz/abit/actions/workflows/test.yml/badge.svg)](https://github.com/preciz/abit/actions/workflows/test.yml)
 
-Use `:atomics` as a bit array or as an array of N-bit counters.
+Use Erlang's `:atomics` as a mutable bit array or as an array of packed N-bit counters.
 
-Documentation can be found at [https://hexdocs.pm/abit](https://hexdocs.pm/abit).
+See the [API documentation](https://hexdocs.pm/abit) on HexDocs.
 
 ## Installation
 
-**Note**: Abit requires OTP 21.2.1 or later.
+Abit requires Elixir 1.7 or later and OTP 21.2.1 or later.
 
 Add `abit` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:abit, "~> 0.3"}
+    {:abit, "~> 0.4"}
   ]
 end
 ```
 
 ## API summary
-See [https://hexdocs.pm/abit](https://hexdocs.pm/abit) for full documentation.
+
+Abit indexes bits and packed counters from zero. Raw `:atomics` indexes, including
+the index accepted by `Abit.Counter.get_all_at_atomic/2`, start from one.
+
+Operations that write to an `:atomics` reference mutate it in place. See the
+[full API documentation](https://hexdocs.pm/abit) for examples and return values.
 
 ### Abit - use `:atomics` as a bit array
 * `Abit.bit_count/1` - Returns the total number of bits in an atomics reference.

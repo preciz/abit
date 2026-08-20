@@ -12,7 +12,7 @@ defmodule Abit.Counter do
       32   | 0..4294967295        | -2147483648..2147483647
 
   If you need 64-bit counters, use
-  [Erlang counters](http://erlang.org/doc/man/counters.html)
+  [Erlang counters](https://www.erlang.org/doc/apps/erts/counters.html).
 
   The `:wrap_around` option defaults to `false`, which is a safe default for
   these small counters. When `:wrap_around` is `false` and an operation would

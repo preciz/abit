@@ -7,6 +7,7 @@ defmodule Abit.MixProject do
   def project do
     [
       app: :abit,
+      name: "Abit",
       version: @version,
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
@@ -14,9 +15,8 @@ defmodule Abit.MixProject do
       docs: docs(),
       package: package(),
       homepage_url: @github,
-      description: """
-      Use `:atomics` as a bit array or as an array of N-bit counters.
-      """
+      source_url: @github,
+      description: "Use Erlang atomics as a bit array or as an array of N-bit counters."
     ]
   end
 
@@ -29,13 +29,15 @@ defmodule Abit.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.40", only: :dev, runtime: false},
-      {:benchee, "~> 1.5", only: :dev}
+      {:benchee, "~> 1.5", only: :dev},
+      {:stream_data, "~> 1.4", only: :test}
     ]
   end
 
   defp docs do
     [
       main: "Abit",
+      extras: ["README.md", "CHANGELOG.md", "LICENSE"],
       source_ref: "v#{@version}",
       source_url: @github
     ]
@@ -45,6 +47,7 @@ defmodule Abit.MixProject do
     [
       maintainers: ["Barna Kovacs"],
       licenses: ["MIT"],
+      files: ["lib", "mix.exs", "README.md", "CHANGELOG.md", "LICENSE"],
       links: %{"GitHub" => @github}
     ]
   end

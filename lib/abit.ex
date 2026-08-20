@@ -2,7 +2,8 @@ defmodule Abit do
   @moduledoc """
   Abit lets you use `:atomics` as a bit array or as an array of N-bit counters.
 
-  To learn more about `:atomics`, see the [Erlang atomics documentation](http://erlang.org/doc/man/atomics.html).
+  To learn more about `:atomics`, see the
+  [Erlang atomics documentation](https://www.erlang.org/doc/apps/erts/atomics.html).
 
   The `Abit` module (this module) has functions to use `:atomics` as a bit array.
   The bit array is zero-indexed.
