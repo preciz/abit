@@ -150,6 +150,26 @@ defmodule AbitTest do
     assert :atomics.get(xor_ref, 2) == 121
   end
 
+  test "binary operations reject unequal atomics sizes without mutating the left reference" do
+    for operation <- [:union, :intersect, :difference, :symmetric_difference],
+        {left_size, right_size} <- [{1, 2}, {2, 1}] do
+      ref_l = :atomics.new(left_size, signed: false)
+      ref_r = :atomics.new(right_size, signed: false)
+
+      for index <- 1..left_size do
+        :atomics.put(ref_l, index, index)
+      end
+
+      original_values = Abit.Atomics.to_list(ref_l)
+
+      assert_raise ArgumentError, fn ->
+        apply(Abit, operation, [ref_l, ref_r])
+      end
+
+      assert Abit.Atomics.to_list(ref_l) == original_values
+    end
+  end
+
   test "invert atomics bit arrays returns reference" do
     ref = :atomics.new(2, signed: true)
 

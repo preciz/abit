@@ -80,10 +80,12 @@ defmodule Abit do
   Combines the atomics references `ref_a` and `ref_b` using bitwise OR.
 
   Mutates and returns `ref_a`.
+
+  Raises `ArgumentError` if the references have different sizes.
   """
   @spec union(reference, reference) :: reference
   def union(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
-    %{size: size} = ref_a |> :atomics.info()
+    size = ensure_same_size!(ref_a, ref_b)
 
     do_union(ref_a, ref_b, size)
   end
@@ -109,10 +111,12 @@ defmodule Abit do
   Intersects the atomics references `ref_a` and `ref_b` using bitwise AND.
 
   Mutates and returns `ref_a`.
+
+  Raises `ArgumentError` if the references have different sizes.
   """
   @spec intersect(reference, reference) :: reference
   def intersect(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
-    %{size: size} = ref_a |> :atomics.info()
+    size = ensure_same_size!(ref_a, ref_b)
 
     do_intersect(ref_a, ref_b, size)
   end
@@ -132,11 +136,13 @@ defmodule Abit do
 
   Clears the bits in `ref_a` that are set in `ref_b`.
   Mutates and returns `ref_a`.
+
+  Raises `ArgumentError` if the references have different sizes.
   """
   @doc since: "0.4.0"
   @spec difference(reference, reference) :: reference
   def difference(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
-    %{size: size} = ref_a |> :atomics.info()
+    size = ensure_same_size!(ref_a, ref_b)
 
     do_difference(ref_a, ref_b, size)
   end
@@ -155,11 +161,13 @@ defmodule Abit do
   Computes the symmetric difference of `ref_a` and `ref_b` using bitwise XOR.
 
   Mutates and returns `ref_a`.
+
+  Raises `ArgumentError` if the references have different sizes.
   """
   @doc since: "0.4.0"
   @spec symmetric_difference(reference, reference) :: reference
   def symmetric_difference(ref_a, ref_b) when is_reference(ref_a) and is_reference(ref_b) do
-    %{size: size} = ref_a |> :atomics.info()
+    size = ensure_same_size!(ref_a, ref_b)
 
     do_symmetric_difference(ref_a, ref_b, size)
   end
@@ -371,16 +379,23 @@ defmodule Abit do
   """
   @spec hamming_distance(reference, reference) :: non_neg_integer
   def hamming_distance(ref_l, ref_r) when is_reference(ref_l) and is_reference(ref_r) do
+    size = ensure_same_size!(ref_l, ref_r)
+
+    do_hamming_distance(ref_l, ref_r, 1, size, 0)
+  end
+
+  defp ensure_same_size!(ref_l, ref_r) do
     %{size: ref_l_size} = :atomics.info(ref_l)
     %{size: ref_r_size} = :atomics.info(ref_r)
 
     if ref_l_size != ref_r_size do
       raise ArgumentError,
             "The sizes of the provided `:atomics` references don't match. " <>
-              "Size of `ref_l` is #{ref_l_size}. Size of `ref_r` is #{ref_r_size}."
+              "Size of the left reference is #{ref_l_size}. " <>
+              "Size of the right reference is #{ref_r_size}."
     end
 
-    do_hamming_distance(ref_l, ref_r, 1, ref_l_size, 0)
+    ref_l_size
   end
 
   defp do_hamming_distance(ref_l, ref_r, index, index, acc) do
